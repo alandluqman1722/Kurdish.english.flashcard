@@ -45,7 +45,7 @@
                 font-size: 1.5rem;
             }
         }
-                
+
         /* Dark mode styles */
         .dark {
             background-color: #1a202c;
@@ -67,7 +67,7 @@
         .dark .shadow-md {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.12) !important;
         }
-                
+
         /* Contact form animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -82,7 +82,7 @@
         .contact-item:hover {
             transform: translateX(5px);
         }
-                
+
         /* Section transitions */
         .section {
             transition: all 0.4s ease;
@@ -95,7 +95,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         /* Language selector switch */
         .language-switch {
             position: relative;
@@ -103,13 +103,13 @@
             width: 60px;
             height: 30px;
         }
-        
+
         .language-switch input { 
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .language-slider {
             position: absolute;
             cursor: pointer;
@@ -121,7 +121,7 @@
             transition: .4s;
             border-radius: 34px;
         }
-        
+
         .language-slider:before {
             position: absolute;
             content: "EN";
@@ -140,63 +140,39 @@
             font-size: 10px;
             color: #7c3aed;
         }
-        
+
         input:checked + .language-slider {
             background-color: #10b981;
         }
-        
+
         input:checked + .language-slider:before {
             content: "KU";
             color: #10b981;
             transform: translateX(30px);
         }
-        
-        /* Audio recording styles */
-        .recording {
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
-        }
-        
+
         /* Advertising section */
         .ad-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 1.5rem;
         }
-        
+
         .ad-item {
             border-radius: 0.5rem;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: transform 0.3s ease;
         }
-        
+
         .ad-item:hover {
             transform: translateY(-5px);
         }
-        
+
         .ad-media {
             height: 200px;
             width: 100%;
             object-fit: cover;
-        }
-        
-        /* Voice similarity meter */
-        .similarity-meter {
-            height: 6px;
-            border-radius: 3px;
-            background: linear-gradient(to right, #ef4444, #f97316, #84cc16, #10b981);
         }
     </style>
 </head>
@@ -319,52 +295,6 @@
                 </div>
             </div>
 
-            <!-- Pronunciation Practice -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                    <i class="fas fa-microphone mr-2 text-indigo-500"></i>Pronunciation Practice
-                </h2>
-                <div class="flex flex-col md:flex-row gap-6 items-center">
-                    <div class="flex-1">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Compare your pronunciation:
-                            </label>
-                            <div class="flex items-center gap-4">
-                                <button id="listen-model" onclick="speakCurrentWord(event, currentSpeakLang)" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg">
-                                    <i class="fas fa-volume-up mr-2"></i>Model
-                                </button>
-                                <button id="record-btn" onclick="toggleRecording()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">
-                                    <i class="fas fa-microphone mr-2"></i><span id="record-text">Record</span>
-                                </button>
-                                <button id="play-btn" onclick="playRecording()" disabled class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg">
-                                    <i class="fas fa-play mr-2"></i>Play
-                                </button>
-                            </div>
-                        </div>
-                        <div id="similarity-display" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Similarity to model:
-                            </label>
-                            <div class="similarity-meter mb-2" id="similarity-meter">
-                                <div id="similarity-progress" class="h-full rounded" style="width: 0%; background-color: #10b981;"></div>
-                            </div>
-                            <p id="similarity-text" class="text-sm text-gray-600 dark:text-gray-300">
-                                Your pronunciation is 0% similar to the model.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex-1 text-center">
-                        <div class="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
-                            Pronunciation Tips
-                        </div>
-                        <div id="pronunciation-tips" class="text-gray-600 dark:text-gray-300 text-sm">
-                            Press the record button to practice your pronunciation. Try to match the model audio.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Navigation Controls -->
             <div class="flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 gap-4 sm:gap-0">
                 <button id="prev-btn" onclick="prevCard()" class="nav-btn bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 w-full sm:w-auto">
@@ -443,7 +373,7 @@
                     </h3>
                     <p class="text-gray-600 dark:text-gray-300">
                         This Kurdish-English flashcard application was created to help language learners improve their vocabulary in an interactive way. 
-                        The app features different difficulty levels, progress tracking, pronunciation practice, and a clean, user-friendly interface.
+                        The app features different difficulty levels, progress tracking, and a clean, user-friendly interface.
                     </p>
                 </div>
             </div>
@@ -489,7 +419,7 @@
                         <i class="fas fa-paper-plane mr-2"></i> Send Message
                     </button>
                 </form>
-                
+
                 <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
                         <i class="fas fa-address-card mr-2 text-indigo-500"></i>Other Ways to Connect
@@ -529,7 +459,7 @@
                 </div>
             </div>
         </section>
-        
+                
         <!-- Advertising Section -->
         <section id="advertising-section" class="section section-hidden max-w-4xl mx-auto">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
@@ -542,7 +472,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                         Current Advertisements
                     </h3>
-                    
+                                    
                     <div class="ad-container" id="active-ads">
                         <!-- Ads will be loaded here -->
                         <div class="ad-item bg-gray-100 dark:bg-gray-700 p-4">
@@ -552,7 +482,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Admin View (password protected) -->
                 <div id="admin-ads" class="hidden">
                     <div class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg">
@@ -563,12 +493,12 @@
                             You're logged in as administrator. You can manage advertisements below.
                         </p>
                     </div>
-                    
+                                    
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
                             <i class="fas fa-plus mr-2 text-indigo-500"></i>Add New Advertisement
                         </h3>
-                        
+                                            
                         <form id="ad-form" class="space-y-4">
                             <div>
                                 <label for="ad-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -576,14 +506,14 @@
                                 </label>
                                 <input type="text" id="ad-title" name="ad-title" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" required>
                             </div>
-                            
+                                                        
                             <div>
                                 <label for="ad-link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Link URL
                                 </label>
                                 <input type="url" id="ad-link" name="ad-link" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" required>
                             </div>
-                            
+                                                        
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label for="ad-media-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -595,7 +525,7 @@
                                         <option value="audio">Audio</option>
                                     </select>
                                 </div>
-                                
+                                                                
                                 <div>
                                     <label for="ad-duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         Duration (days)
@@ -603,14 +533,14 @@
                                     <input type="number" id="ad-duration" name="ad-duration" min="1" max="30" value="7" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" required>
                                 </div>
                             </div>
-                            
+                                                        
                             <div>
                                 <label for="ad-media" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Upload Media
                                 </label>
                                 <input type="file" id="ad-media" name="ad-media" accept="image/*,video/*,audio/*" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white" required>
                             </div>
-                            
+                                                        
                             <div class="flex justify-end gap-4">
                                 <button type="button" onclick="logoutAdmin()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg">
                                     Logout
@@ -621,12 +551,12 @@
                             </div>
                         </form>
                     </div>
-                    
+                                    
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
                             <i class="fas fa-list mr-2 text-indigo-500"></i>Manage Active Ads
                         </h3>
-                        
+                                                
                         <div class="ad-container" id="admin-active-ads">
                             <!-- Admin will see all active ads here with delete option -->
                             <div class="ad-item bg-gray-100 dark:bg-gray-700 p-4">
@@ -637,7 +567,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Password prompt -->
                 <div id="password-prompt" class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -646,7 +576,7 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         To submit or manage advertisements, please enter the admin password.
                     </p>
-                    
+                                    
                     <div class="flex items-center gap-4">
                         <input type="password" id="admin-password" placeholder="Enter password" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-600 dark:text-white">
                         <button onclick="loginAdmin()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">
@@ -726,871 +656,7 @@
                 { key: "anything", ku: "هیچ شتێک" },
                 { key: "apartment", ku: "ئەپارتمان" },
                 { key: "apple", ku: "سێو" },
-                { key: "April", ku: "نیسان" },
-                { key: "area", ku: "ناوچە" },
-                { key: "arm", ku: "قۆڵ" },
-                { key: "around", ku: "دەوروبەر" },
-                { key: "arrive", ku: "گەیشتن" },
-                { key: "art", ku: "هونەر" },
-                { key: "article", ku: "وتار" },
-                { key: "artist", ku: "هونەرمەند" },
-                { key: "as", ku: "وەک" },
-                { key: "ask", ku: "پرسیار کردن" },
-                { key: "at", ku: "لە" },
-                { key: "August", ku: "ئاب" },
-                { key: "aunt", ku: "پوور" },
-                { key: "autumn", ku: "پاییز" },
-                { key: "away", ku: "دوور" },
-                { key: "baby", ku: "منداڵ" },
-                { key: "back", ku: "پشت" },
-                { key: "bad", ku: "خراپ" },
-                { key: "bag", ku: "جانتا" },
-                { key: "ball", ku: "تۆپ" },
-                { key: "banana", ku: "مۆز" },
-                { key: "band", ku: "باند" },
-                { key: "bank", ku: "بانک" },
-                { key: "bath", ku: "حمام" },
-                { key: "bathroom", ku: "حەمام" },
-                { key: "be", ku: "بوون" },
-                { key: "beach", ku: "کەنار دەریا" },
-                { key: "beautiful", ku: "جوان" },
-                { key: "because", ku: "چونکە" },
-                { key: "become", ku: "بوون بە" },
-                { key: "bed", ku: "جێگا" },
-                { key: "bedroom", ku: "ژووری خەوتن" },
-                { key: "beer", ku: "بیرە" },
-                { key: "before", ku: "پێش" },
-                { key: "begin", ku: "دەستپێکردن" },
-                { key: "beginning", ku: "سەرەتا" },
-                { key: "behind", ku: "پشت" },
-                { key: "believe", ku: "باوەڕ کردن" },
-                { key: "below", ku: "خوارەوە" },
-                { key: "best", ku: "باشترین" },
-                { key: "better", ku: "باشتر" },
-                { key: "between", ku: "نێوان" },
-                { key: "bicycle", ku: "پاسکیل" },
-                { key: "big", ku: "گەورە" },
-                { key: "bike", ku: "پاسکیل" },
-                { key: "bill", ku: "پارە" },
-                { key: "bird", ku: "باڵندە" },
-                { key: "birthday", ku: "بەرواری لەدایکبوون" },
-                { key: "black", ku: "ڕەش" },
-                { key: "blog", ku: "بلۆگ" },
-                { key: "blonde", ku: "زەرد" },
-                { key: "blue", ku: "شین" },
-                { key: "boat", ku: "بەلەم" },
-                { key: "body", ku: "جەستە" },
-                { key: "book", ku: "کتێب" },
-                { key: "boot", ku: "پوتڵ" },
-                { key: "bored", ku: "بێزار" },
-                { key: "boring", ku: "بێزارکەر" },
-                { key: "born", ku: "لەدایکبوو" },
-                { key: "both", ku: "هەردوو" },
-                { key: "bottle", ku: "بوتڵ" },
-                { key: "box", ku: "قوتوی" },
-                { key: "boy", ku: "کوڕ" },
-                { key: "boyfriend", ku: "هاوڕێی پیا" },
-                { key: "bread", ku: "نان" },
-                { key: "break", ku: "شکاندن" },
-                { key: "breakfast", ku: "بەیانی" },
-                { key: "bring", ku: "هێنان" },
-                { key: "brother", ku: "برا" },
-                { key: "brown", ku: "قاوەیی" },
-                { key: "build", ku: "بیناکردن" },
-                { key: "building", ku: "بینا" },
-                { key: "bus", ku: "پاس" },
-                { key: "business", ku: "بازرگانی" },
-                { key: "busy", ku: "سەرقاڵ" },
-                { key: "but", ku: "بەڵام" },
-                { key: "butter", ku: "کەرە" },
-                { key: "buy", ku: "کڕین" },
-                { key: "by", ku: "لەلایەن" },
-                { key: "bye", ku: "خەفات" },
-                { key: "cafe", ku: "قاوەخانە" },
-                { key: "cake", ku: "کێک" },
-                { key: "call", ku: "بانگ کردن" },
-                { key: "camera", ku: "کامێرا" },
-                { key: "can", ku: "توانین" },
-                { key: "cannot", ku: "ناتوانین" },
-                { key: "capital", ku: "پایتەخت" },
-                { key: "car", ku: "ئۆتۆمبێل" },
-                { key: "card", ku: "کارت" },
-                { key: "career", ku: "پیشە" },
-                { key: "carrot", ku: "گێزەر" },
-                { key: "carry", ku: "هەڵگرتن" },
-                { key: "cat", ku: "پشیلە" },
-                { key: "CD", ku: "سی دی" },
-                { key: "cent", ku: "سەنت" },
-                { key: "centre", ku: "ناوەند" },
-                { key: "century", ku: "سەدە" },
-                { key: "chair", ku: "کورسی" },
-                { key: "change", ku: "گۆڕین" },
-                { key: "chart", ku: "نەخشە" },
-                { key: "cheap", ku: "هەرزان" },
-                { key: "check", ku: "پشکنین" },
-                { key: "cheese", ku: "پەنیر" },
-                { key: "chicken", ku: "مەریشک" },
-                { key: "child", ku: "منداڵ" },
-                { key: "chocolate", ku: "چۆکلێت" },
-                { key: "choose", ku: "هەڵبژاردن" },
-                { key: "cinema", ku: "سینەما" },
-                { key: "city", ku: "شار" },
-                { key: "class", ku: "پۆل" },
-                { key: "classroom", ku: "ژووری پۆل" },
-                { key: "clean", ku: "پاک" },
-                { key: "climb", ku: "هەڵکشتن" },
-                { key: "clock", ku: "کاتژمێر" },
-                { key: "close", ku: "نزیک" },
-                { key: "clothes", ku: "جلوبەرگ" },
-                { key: "club", ku: "کڵاب" },
-                { key: "coat", ku: "پالتۆ" },
-                { key: "coffee", ku: "قاوە" },
-                { key: "cold", ku: "سارد" },
-                { key: "college", ku: "کۆلێژ" },
-                { key: "colour", ku: "ڕەنگ" },
-                { key: "come", ku: "هاتن" },
-                { key: "common", ku: "هاوەڵ" },
-                { key: "company", ku: "کۆمپانیا" },
-                { key: "compare", ku: "بەراورد کردن" },
-                { key: "complete", ku: "تەواو" },
-                { key: "computer", ku: "کۆمپیوتەر" },
-                { key: "concert", ku: "کۆنسێرت" },
-                { key: "conversation", ku: "گفتوگۆ" },
-                { key: "cook", ku: "چێشت لێنان" },
-                { key: "cooking", ku: "چێشت" },
-                { key: "cool", ku: "سارد" },
-                { key: "correct", ku: "ڕاست" },
-                { key: "cost", ku: "تێچوون" },
-                { key: "could", ku: "توانی" },
-                { key: "country", ku: "وڵات" },
-                { key: "course", ku: "خول" },
-                { key: "cousin", ku: "باوک" },
-                { key: "cow", ku: "مانگا" },
-                { key: "cream", ku: "کرێم" },
-                { key: "create", ku: "دروست کردن" },
-                { key: "culture", ku: "کلتور" },
-                { key: "cup", ku: "پەرداخ" },
-                { key: "customer", ku: "کڕیار" },
-                { key: "cut", ku: "بڕین" },
-                { key: "dad", ku: "باوک" },
-                { key: "dance", ku: "سەما" },
-                { key: "dancer", ku: "سەماکار" },
-                { key: "dancing", ku: "سەما" },
-                { key: "dangerous", ku: "مەترسیدار" },
-                { key: "dark", ku: "تاریک" },
-                { key: "date", ku: "بەروار" },
-                { key: "daughter", ku: "کچ" },
-                { key: "day", ku: "ڕۆژ" },
-                { key: "dear", ku: "ئازیز" },
-                { key: "December", ku: "کانوونی یەکەم" },
-                { key: "decide", ku: "بڕیار دان" },
-                { key: "delicious", ku: "خۆش" },
-                { key: "describe", ku: "وەسف کردن" },
-                { key: "description", ku: "وەسف" },
-                { key: "design", ku: "دیزاین" },
-                { key: "desk", ku: "مێز" },
-                { key: "detail", ku: "وردەکاری" },
-                { key: "dialogue", ku: "گفتوگۆ" },
-                { key: "dictionary", ku: "فەرهەنگ" },
-                { key: "die", ku: "مردن" },
-                { key: "diet", ku: "خۆراک" },
-                { key: "difference", ku: "جیاوازی" },
-                { key: "different", ku: "جیاواز" },
-                { key: "difficult", ku: "قورس" },
-                { key: "dinner", ku: "بەیانی" },
-                { key: "dirty", ku: "پیس" },
-                { key: "discuss", ku: "گفتوگۆ کردن" },
-                { key: "dish", ku: "قاپ" },
-                { key: "do", ku: "کردن" },
-                { key: "doctor", ku: "دکتۆر" },
-                { key: "dog", ku: "سەگ" },
-                { key: "dollar", ku: "دۆلار" },
-                { key: "door", ku: "دەرگا" },
-                { key: "down", ku: "خوارەوە" },
-                { key: "downstairs", ku: "ژێرەوە" },
-                { key: "draw", ku: "وێنە کێشان" },
-                { key: "dress", ku: "جل" },
-                { key: "drink", ku: "خواردنەوە" },
-                { key: "drive", ku: "لێخوڕین" },
-                { key: "driver", ku: "شۆفێر" },
-                { key: "during", ku: "لە ماوەی" },
-                { key: "DVD", ku: "دی ڤی دی" },
-                { key: "each", ku: "هەر یەک" },
-                { key: "ear", ku: "گوێ" },
-                { key: "early", ku: "زۆر" },
-                { key: "east", ku: "خۆرهەڵات" },
-                { key: "easy", ku: "ئاسان" },
-                { key: "eat", ku: "خواردن" },
-                { key: "egg", ku: "هێلکە" },
-                { key: "eight", ku: "هەشت" },
-                { key: "eighteen", ku: "هەژدە" },
-                { key: "eighty", ku: "هەشتا" },
-                { key: "elephant", ku: "فیل" },
-                { key: "eleven", ku: "یازدە" },
-                { key: "else", ku: "جیاواز" },
-                { key: "email", ku: "ئیمێل" },
-                { key: "end", ku: "کۆتایی" },
-                { key: "enjoy", ku: "چێژ وەرگرتن" },
-                { key: "enough", ku: "بەس" },
-                { key: "euro", ku: "یۆرۆ" },
-                { key: "even", ku: "تەنانەت" },
-                { key: "evening", ku: "ئێوارە" },
-                { key: "event", ku: "ڕووداو" },
-                { key: "ever", ku: "هەرگیز" },
-                { key: "every", ku: "هەموو" },
-                { key: "everybody", ku: "هەموو کەس" },
-                { key: "everyone", ku: "هەموو کەس" },
-                { key: "everything", ku: "هەموو شتێک" },
-                { key: "exam", ku: "تاقیکردنەوە" },
-                { key: "example", ku: "نموونە" },
-                { key: "excited", ku: "پەرۆش" },
-                { key: "exciting", ku: "پەرۆشکەر" },
-                { key: "exercise", ku: "ڕاهێنان" },
-                { key: "expensive", ku: "گران" },
-                { key: "explain", ku: "ڕوون کردنەوە" },
-                { key: "extra", ku: "زیادە" },
-                { key: "eye", ku: "چاو" },
-                { key: "face", ku: "ڕوو" },
-                { key: "fact", ku: "ڕاستی" },
-                { key: "fall", ku: "کەوتن" },
-                { key: "false", ku: "هەڵە" },
-                { key: "family", ku: "خێزان" },
-                { key: "famous", ku: "بەناوبانگ" },
-                { key: "fantastic", ku: "خۆش" },
-                { key: "far", ku: "دوور" },
-                { key: "farm", ku: "کێڵگە" },
-                { key: "farmer", ku: "کێڵکار" },
-                { key: "fast", ku: "خێرا" },
-                { key: "fat", ku: "قەڵەو" },
-                { key: "father", ku: "باوک" },
-                { key: "favourite", ku: "دڵخواز" },
-                { key: "February", ku: "شوبات" },
-                { key: "feel", ku: "هەست کردن" },
-                { key: "feeling", ku: "هەست" },
-                { key: "festival", ku: "بەرنامە" },
-                { key: "few", ku: "کەم" },
-                { key: "fifteen", ku: "پانزە" },
-                { key: "fifth", ku: "پێنجەم" },
-                { key: "fifty", ku: "پەنجا" },
-                { key: "fill", ku: "پڕ کردن" },
-                { key: "film", ku: "فیلم" },
-                { key: "final", ku: "کۆتایی" },
-                { key: "find", ku: "دۆزینەوە" },
-                { key: "fine", ku: "باش" },
-                { key: "finish", ku: "تەواو کردن" },
-                { key: "fire", ku: "ئاگر" },
-                { key: "first", ku: "یەکەم" },
-                { key: "fish", ku: "ماسی" },
-                { key: "five", ku: "پێنج" },
-                { key: "flat", ku: "پان" },
-                { key: "flight", ku: "فڕین" },
-                { key: "floor", ku: "ژێرەوە" },
-                { key: "flower", ku: "گوڵ" },
-                { key: "fly", ku: "فڕین" },
-                { key: "follow", ku: "شوێن کەوتن" },
-                { key: "food", ku: "خواردن" },
-                { key: "foot", ku: "پێ" },
-                { key: "football", ku: "تۆپی پێ" },
-                { key: "for", ku: "بۆ" },
-                { key: "forget", ku: "لەبیر کردن" },
-                { key: "form", ku: "فۆرم" },
-                { key: "forty", ku: "چل" },
-                { key: "four", ku: "چوار" },
-                { key: "fourteen", ku: "چواردە" },
-                { key: "fourth", ku: "چوارەم" },
-                { key: "free", ku: "ئازاد" },
-                { key: "Friday", ku: "هەینی" },
-                { key: "friend", ku: "هاوڕێ" },
-                { key: "friendly", ku: "هاوڕێیەتی" },
-                { key: "from", ku: "لە" },
-                { key: "front", ku: "پێشەوە" },
-                { key: "fruit", ku: "میوە" },
-                { key: "full", ku: "پڕ" },
-                { key: "fun", ku: "خۆشی" },
-                { key: "funny", ku: "پێکەنیناوی" },
-                { key: "future", ku: "داهاتوو" },
-                { key: "game", ku: "یاری" },
-                { key: "garden", ku: "باخ" },
-                { key: "geography", ku: "جوگرافیا" },
-                { key: "get", ku: "هێنان" },
-                { key: "girl", ku: "کچ" },
-                { key: "girlfriend", ku: "هاوڕێی کچ" },
-                { key: "give", ku: "بەخشین" },
-                { key: "glass", ku: "شووشە" },
-                { key: "go", ku: "چوون" },
-                { key: "good", ku: "باش" },
-                { key: "goodbye", ku: "خەفات" },
-                { key: "grandfather", ku: "بابە گەورە" },
-                { key: "grandmother", ku: "دایە گەورە" },
-                { key: "grandparent", ku: "بابە یان دایە گەورە" },
-                { key: "great", ku: "مەزن" },
-                { key: "green", ku: "سەوز" },
-                { key: "grey", ku: "خۆڵەمێشی" },
-                { key: "group", ku: "گرووپ" },
-                { key: "grow", ku: "گەورە بوون" },
-                { key: "guess", ku: "خەملاندن" },
-                { key: "guitar", ku: "گیتار" },
-                { key: "gym", ku: "جیم" },
-                { key: "hair", ku: "قژ" },
-                { key: "half", ku: "نیو" },
-                { key: "hand", ku: "دەست" },
-                { key: "happen", ku: "ڕوودان" },
-                { key: "happy", ku: "خۆشحاڵ" },
-                { key: "hard", ku: "قورس" },
-                { key: "hat", ku: "کڵاو" },
-                { key: "hate", ku: "ڕق" },
-                { key: "have", ku: "هەبوون" },
-                { key: "have to", ku: "پێویستی" },
-                { key: "he", ku: "ئەو" },
-                { key: "head", ku: "سەر" },
-                { key: "health", ku: "تەندروستی" },
-                { key: "healthy", ku: "تەندروست" },
-                { key: "hear", ku: "بیستن" },
-                { key: "hello", ku: "سڵاو" },
-                { key: "help", ku: "یارمەتی" },
-                { key: "her", ku: "ئەو" },
-                { key: "here", ku: "لێرە" },
-                { key: "hey", ku: "هێی" },
-                { key: "hi", ku: "سڵاو" },
-                { key: "high", ku: "بەرز" },
-                { key: "him", ku: "ئەو" },
-                { key: "his", ku: "ئەو" },
-                { key: "history", ku: "مێژوو" },
-                { key: "hobby", ku: "حەزی" },
-                { key: "holiday", ku: "پشوو" },
-                { key: "home", ku: "ماڵ" },
-                { key: "homework", ku: "ئەرکی ماڵەوە" },
-                { key: "hope", ku: "هیوا" },
-                { key: "horse", ku: "ئەسپ" },
-                { key: "hospital", ku: "نەخۆشخانە" },
-                { key: "hot", ku: "گەرم" },
-                { key: "hotel", ku: "هۆتێل" },
-                { key: "hour", ku: "کاتژمێر" },
-                { key: "house", ku: "ماڵ" },
-                { key: "how", ku: "چۆن" },
-                { key: "however", ku: "هەرچۆنێک بێت" },
-                { key: "hundred", ku: "سەد" },
-                { key: "hungry", ku: "برسی" },
-                { key: "husband", ku: "هاوژین" },
-                { key: "I", ku: "من" },
-                { key: "ice", ku: "سەهۆڵ" },
-                { key: "ice cream", ku: "بەفرە" },
-                { key: "idea", ku: "بیرۆکە" },
-                { key: "if", ku: "ئەگەر" },
-                { key: "imagine", ku: "خەیاڵ کردن" },
-                { key: "important", ku: "گرنگ" },
-                { key: "improve", ku: "باشتر کردن" },
-                { key: "in", ku: "لە" },
-                { key: "include", ku: "تێدایە" },
-                { key: "information", ku: "زانیاری" },
-                { key: "interest", ku: "حەز" },
-                { key: "interested", ku: "حەزی لێیە" },
-                { key: "interesting", ku: "سەرنجڕاکێش" },
-                { key: "internet", ku: "ئینتەرنێت" },
-                { key: "interview", ku: "چاوپێکەوتن" },
-                { key: "into", ku: "بۆ ناو" },
-                { key: "introduce", ku: "ناساندن" },
-                { key: "island", ku: "دوورگە" },
-                { key: "it", ku: "ئەو" },
-                { key: "its", ku: "ئەو" },
-                { key: "jacket", ku: "جاکێت" },
-                { key: "January", ku: "کانوونی دووەم" },
-                { key: "jeans", ku: "جینز" },
-                { key: "job", ku: "کار" },
-                { key: "join", ku: "بەشداری کردن" },
-                { key: "journey", ku: "گەشت" },
-                { key: "juice", ku: "شیرە" },
-                { key: "July", ku: "تەممووز" },
-                { key: "June", ku: "حوزەیران" },
-                { key: "just", ku: "تەنها" },
-                { key: "keep", ku: "پاراستن" },
-                { key: "key", ku: "کیلید" },
-                { key: "kilometre", ku: "کیلۆمەتر" },
-                { key: "kind", ku: "جۆر" },
-                { key: "kitchen", ku: "کۆشک" },
-                { key: "know", ku: "زانین" },
-                { key: "land", ku: "زەوی" },
-                { key: "language", ku: "زمان" },
-                { key: "large", ku: "گەورە" },
-                { key: "last", ku: "کۆتایی" },
-                { key: "late", ku: "درەنگ" },
-                { key: "later", ku: "دواتر" },
-                { key: "laugh", ku: "پێکەنین" },
-                { key: "learn", ku: "فێربوون" },
-                { key: "leave", ku: "جێهێشتنی" },
-                { key: "left", ku: "چەپ" },
-                { key: "leg", ku: "قاچ" },
-                { key: "lesson", ku: "وانە" },
-                { key: "let", ku: "ڕێگە دان" },
-                { key: "letter", ku: "نامە" },
-                { key: "library", ku: "کتێبخانە" },
-                { key: "lie", ku: "درۆ" },
-                { key: "life", ku: "ژیان" },
-                { key: "light", ku: "ڕووناکی" },
-                { key: "like", ku: "وەک" },
-                { key: "like", ku: "حەز" },
-                { key: "line", ku: "هێڵ" },
-                { key: "lion", ku: "شێر" },
-                { key: "list", ku: "لیست" },
-                { key: "listen", ku: "گوێگرتن" },
-                { key: "little", ku: "بچووک" },
-                { key: "live", ku: "ژیان" },
-                { key: "local", ku: "ناحیەیی" },
-                { key: "long", ku: "درێژ" },
-                { key: "look", ku: "سەیر کردن" },
-                { key: "lose", ku: "لەدەست دان" },
-                { key: "lot", ku: "زۆر" },
-                { key: "love", ku: "خۆشەویستی" },
-                { key: "lunch", ku: "نیوەڕۆ" },
-                { key: "machine", ku: "ماشین" },
-                { key: "magazine", ku: "گۆڤار" },
-                { key: "main", ku: "سەرەکی" },
-                { key: "make", ku: "کردن" },
-                { key: "man", ku: "پیاو" },
-                { key: "many", ku: "زۆر" },
-                { key: "map", ku: "نەخشە" },
-                { key: "March", ku: "ئازار" },
-                { key: "market", ku: "بازاڕ" },
-                { key: "married", ku: "هاوسەرگیری" },
-                { key: "match", ku: "یاری" },
-                { key: "May", ku: "ئایار" },
-                { key: "maybe", ku: "لەوانەیە" },
-                { key: "me", ku: "من" },
-                { key: "meal", ku: "خواردن" },
-                { key: "mean", ku: "واتا" },
-                { key: "meaning", ku: "واتا" },
-                { key: "meat", ku: "گۆشت" },
-                { key: "meet", ku: "بینین" },
-                { key: "meeting", ku: "کۆبوونەوە" },
-                { key: "member", ku: "ئەندام" },
-                { key: "menu", ku: "مینو" },
-                { key: "message", ku: "پەیام" },
-                { key: "metre", ku: "مەتر" },
-                { key: "midnight", ku: "نیوەشەو" },
-                { key: "mile", ku: "میل" },
-                { key: "milk", ku: "شیر" },
-                { key: "million", ku: "ملیۆن" },
-                { key: "minute", ku: "خولەک" },
-                { key: "miss", ku: "لەدەست دان" },
-                { key: "mistake", ku: "هەڵە" },
-                { key: "model", ku: "مۆدێل" },
-                { key: "modern", ku: "مۆدێرن" },
-                { key: "moment", ku: "سات" },
-                { key: "Monday", ku: "دووشەممە" },
-                { key: "money", ku: "پارە" },
-                { key: "month", ku: "مانگ" },
-                { key: "more", ku: "زیاتر" },
-                { key: "morning", ku: "بەیانی" },
-                { key: "most", ku: "زۆرینە" },
-                { key: "mother", ku: "دایک" },
-                { key: "mountain", ku: "چیا" },
-                { key: "mouse", ku: "مش" },
-                { key: "mouth", ku: "دەم" },
-                { key: "move", ku: "جوڵاندن" },
-                { key: "movie", ku: "فیلم" },
-                { key: "much", ku: "زۆر" },
-                { key: "mum", ku: "دایک" },
-                { key: "museum", ku: "مۆزەخانە" },
-                { key: "music", ku: "مۆسیقا" },
-                { key: "must", ku: "پێویستە" },
-                { key: "my", ku: "من" },
-                { key: "name", ku: "ناو" },
-                { key: "natural", ku: "سروشتی" },
-                { key: "near", ku: "نزیک" },
-                { key: "need", ku: "پێویستی" },
-                { key: "negative", ku: "نەرێنی" },
-                { key: "neighbour", ku: "دراوسێ" },
-                { key: "never", ku: "هەرگیز" },
-                { key: "new", ku: "نوێ" },
-                { key: "news", ku: "هەواڵ" },
-                { key: "newspaper", ku: "ڕۆژنامە" },
-                { key: "next", ku: "دواتر" },
-                { key: "next to", ku: "لە تەنیشت" },
-                { key: "nice", ku: "خۆش" },
-                { key: "night", ku: "شەو" },
-                { key: "nine", ku: "نۆ" },
-                { key: "nineteen", ku: "نۆزدە" },
-                { key: "ninety", ku: "نەوەد" },
-                { key: "no", ku: "نەخێر" },
-                { key: "no one", ku: "هیچ کەس" },
-                { key: "nobody", ku: "هیچ کەس" },
-                { key: "north", ku: "باکور" },
-                { key: "nose", ku: "لوت" },
-                { key: "not", ku: "نەخێر" },
-                { key: "note", ku: "تێبینی" },
-                { key: "nothing", ku: "هیچ شتێک" },
-                { key: "November", ku: "تشرینی دووەم" },
-                { key: "now", ku: "ئێستا" },
-                { key: "number", ku: "ژمارە" },
-                { key: "nurse", ku: "پەرستار" },
-                { key: "object", ku: "بەرھەم" },
-                { key: "o’clock", ku: "کاتژمێر" },
-                { key: "October", ku: "تشرینی یەکەم" },
-                { key: "of", ku: "لە" },
-                { key: "off", ku: "خاموش" },
-                { key: "office", ku: "ئۆفیس" },
-                { key: "often", ku: "زۆر جار" },
-                { key: "oh", ku: "ئۆه" },
-                { key: "OK", ku: "باشە" },
-                { key: "old", ku: "پیر" },
-                { key: "on", ku: "لەسەر" },
-                { key: "once", ku: "جارێک" },
-                { key: "one", ku: "یەک" },
-                { key: "onion", ku: "پیاز" },
-                { key: "online", ku: "ئۆنلاین" },
-                { key: "only", ku: "تەنها" },
-                { key: "open", ku: "کردنەوە" },
-                { key: "opinion", ku: "بۆچوون" },
-                { key: "opposite", ku: "بەرامبەر" },
-                { key: "or", ku: "یان" },
-                { key: "orange", ku: "پرتەقاڵ" },
-                { key: "order", ku: "فەرمان" },
-                { key: "other", ku: "ئەوی تر" },
-                { key: "our", ku: "ئێمە" },
-                { key: "out", ku: "دەرەوە" },
-                { key: "outside", ku: "دەرەوە" },
-                { key: "over", ku: "تەواو" },
-                { key: "own", ku: "خاوەن" },
-                { key: "page", ku: "پەڕە" },
-                { key: "paint", ku: "رەنگ" },
-                { key: "painting", ku: "وێنە" },
-                { key: "pair", ku: "جووت" },
-                { key: "paper", ku: "کاغەز" },
-                { key: "paragraph", ku: "بەند" },
-                { key: "parent", ku: "دایک و باوک" },
-                { key: "park", ku: "پارک" },
-                { key: "part", ku: "بەش" },
-                { key: "partner", ku: "هاوکار" },
-                { key: "party", ku: "پارتی" },
-                { key: "passport", ku: "پاسپۆرت" },
-                { key: "past", ku: "پێشوو" },
-                { key: "pay", ku: "پارە دان" },
-                { key: "pen", ku: "قەڵەم" },
-                { key: "pencil", ku: "پێنووس" },
-                { key: "people", ku: "خەڵک" },
-                { key: "pepper", ku: "بیبەر" },
-                { key: "perfect", ku: "تەواو" },
-                { key: "period", ku: "ماوە" },
-                { key: "person", ku: "کەس" },
-                { key: "personal", ku: "تایبەت" },
-                { key: "phone", ku: "تەلەفۆن" },
-                { key: "photo", ku: "وێنە" },
-                { key: "photograph", ku: "وێنە" },
-                { key: "phrase", ku: "دەستەواژە" },
-                { key: "piano", ku: "پیانۆ" },
-                { key: "picture", ku: "وێنە" },
-                { key: "piece", ku: "پارچە" },
-                { key: "pig", ku: "بەراز" },
-                { key: "pink", ku: "پەمەیی" },
-                { key: "place", ku: "شوێن" },
-                { key: "plan", ku: "پلان" },
-                { key: "plane", ku: "فڕۆکە" },
-                { key: "plant", ku: "ڕووەک" },
-                { key: "play", ku: "یاری کردن" },
-                { key: "player", ku: "یاریزان" },
-                { key: "please", ku: "تکایە" },
-                { key: "point", ku: "خاڵ" },
-                { key: "police", ku: "پۆلیس" },
-                { key: "policeman", ku: "پۆلیس" },
-                { key: "pool", ku: "مەلەوانی" },
-                { key: "poor", ku: "هەژار" },
-                { key: "popular", ku: "باو" },
-                { key: "positive", ku: "ئەرێنی" },
-                { key: "possible", ku: "دەکرێت" },
-                { key: "post", ku: "پۆست" },
-                { key: "potato", ku: "کەڵە" },
-                { key: "pound", ku: "پاوەند" },
-                { key: "practice", ku: "ڕاهێنان" },
-                { key: "practise", ku: "ڕاهێنان" },
-                { key: "prefer", ku: "پێشتر" },
-                { key: "prepare", ku: "ئامادە کردن" },
-                { key: "present", ku: "بەخشین" },
-                { key: "pretty", ku: "جوان" },
-                { key: "price", ku: "نرخ" },
-                { key: "probably", ku: "لەوانەیە" },
-                { key: "problem", ku: "کێشە" },
-                { key: "product", ku: "بەرھەم" },
-                { key: "programme", ku: "بەرنامە" },
-                { key: "project", ku: "پرۆژە" },
-                { key: "purple", ku: "مۆر" },
-                { key: "put", ku: "دانان" },
-                { key: "quarter", ku: "چارەک" },
-                { key: "question", ku: "پرسیار" },
-                { key: "quick", ku: "خێرا" },
-                { key: "quickly", ku: "بەخێرایی" },
-                { key: "quiet", ku: "بێدەنگ" },
-                { key: "quite", ku: "زۆر" },
-                { key: "radio", ku: "رادیۆ" },
-                { key: "rain", ku: "باران" },
-                { key: "read", ku: "خوێندن" },
-                { key: "reader", ku: "خوێنەر" },
-                { key: "reading", ku: "خوێندن" },
-                { key: "ready", ku: "ئامادە" },
-                { key: "real", ku: "راست" },
-                { key: "really", ku: "بەڕاستی" },
-                { key: "reason", ku: "هۆکار" },
-                { key: "red", ku: "سور" },
-                { key: "relax", ku: "پشوو دان" },
-                { key: "remember", ku: "بیر کردن" },
-                { key: "repeat", ku: "دووبارە کردن" },
-                { key: "report", ku: "راپۆرت" },
-                { key: "restaurant", ku: "رێستۆران" },
-                { key: "result", ku: "ئەنجام" },
-                { key: "return", ku: "گەڕانەوە" },
-                { key: "rice", ku: "برنج" },
-                { key: "rich", ku: "دەوڵەمەند" },
-                { key: "ride", ku: "سواری" },
-                { key: "right", ku: "راست" },
-                { key: "river", ku: "چۆم" },
-                { key: "road", ku: "ڕێگا" },
-                { key: "room", ku: "ژوور" },
-                { key: "routine", ku: "ڕێتین" },
-                { key: "rule", ku: "یاسا" },
-                { key: "run", ku: "ڕاکردن" },
-                { key: "sad", ku: "خەمبار" },
-                { key: "salad", ku: "سەلاد" },
-                { key: "salt", ku: "خوێ" },
-                { key: "same", ku: "هەمان" },
-                { key: "sandwich", ku: "ساندویچ" },
-                { key: "Saturday", ku: "شەممە" },
-                { key: "say", ku: "گووتن" },
-                { key: "school", ku: "قوتابخانە" },
-                { key: "science", ku: "زانست" },
-                { key: "scientist", ku: "زانا" },
-                { key: "sea", ku: "دەریا" },
-                { key: "second", ku: "دووەم" },
-                { key: "second", ku: "چرکە" },
-                { key: "section", ku: "بەش" },
-                { key: "see", ku: "بینین" },
-                { key: "sell", ku: "فرۆشتنی" },
-                { key: "send", ku: "ناردن" },
-                { key: "sentence", ku: "ڕستە" },
-                { key: "September", ku: "ئەیلوول" },
-                { key: "seven", ku: "حەوت" },
-                { key: "seventeen", ku: "حەڤدە" },
-                { key: "seventy", ku: "حەفتا" },
-                { key: "share", ku: "هاوبەشی" },
-                { key: "she", ku: "ئەو" },
-                { key: "sheep", ku: "مەڕ" },
-                { key: "shirt", ku: "کراس" },
-                { key: "shoe", ku: "پێڵاو" },
-                { key: "shop", ku: "دوکان" },
-                { key: "shopping", ku: "بازاڕ کردن" },
-                { key: "short", ku: "کورت" },
-                { key: "should", ku: "پێویستە" },
-                { key: "show", ku: "نیشان دان" },
-                { key: "shower", ku: "حمام" },
-                { key: "sick", ku: "نەخۆش" },
-                { key: "similar", ku: "هاوشێوە" },
-                { key: "sing", ku: "گۆرانی" },
-                { key: "singer", ku: "گۆرانیبێژ" },
-                { key: "sister", ku: "خوشک" },
-                { key: "sit", ku: "دانیشتن" },
-                { key: "situation", ku: "بارودۆخ" },
-                { key: "six", ku: "شەش" },
-                { key: "sixteen", ku: "شازدە" },
-                { key: "sixty", ku: "شەست" },
-                { key: "skill", ku: "توانا" },
-                { key: "skirt", ku: "دام" },
-                { key: "sleep", ku: "خەوتن" },
-                { key: "slow", ku: "هێواش" },
-                { key: "small", ku: "بچووک" },
-                { key: "snake", ku: "مار" },
-                { key: "snow", ku: "بەفر" },
-                { key: "so", ku: "بۆیە" },
-                { key: "some", ku: "هەندێک" },
-                { key: "somebody", ku: "کەسێک" },
-                { key: "someone", ku: "کەسێک" },
-                { key: "something", ku: "شتێک" },
-                { key: "sometimes", ku: "هەندێک جار" },
-                { key: "son", ku: "کوڕ" },
-                { key: "song", ku: "گۆرانی" },
-                { key: "soon", ku: "بەزووی" },
-                { key: "sorry", ku: "ببورە" },
-                { key: "sound", ku: "دەنگ" },
-                { key: "soup", ku: "شۆربا" },
-                { key: "south", ku: "باشور" },
-                { key: "space", ku: "بۆشایی" },
-                { key: "speak", ku: "قسە کردن" },
-                { key: "special", ku: "تایبەت" },
-                { key: "spell", ku: "نوسین" },
-                { key: "spelling", ku: "نوسین" },
-                { key: "spend", ku: "خەرج کردن" },
-                { key: "sport", ku: "وەرزش" },
-                { key: "spring", ku: "بەهار" },
-                { key: "stand", ku: "وەستان" },
-                { key: "star", ku: "ئەستێرە" },
-                { key: "start", ku: "دەستپێکردن" },
-                { key: "statement", ku: "ڕاگەیاندن" },
-                { key: "station", ku: "ئێستگە" },
-                { key: "stay", ku: "مانەوە" },
-                { key: "still", ku: "هێشتا" },
-                { key: "stop", ku: "وەستان" },
-                { key: "story", ku: "چیرۆک" },
-                { key: "street", ku: "شەقام" },
-                { key: "strong", ku: "بەهێز" },
-                { key: "student", ku: "خوێندکار" },
-                { key: "study", ku: "خوێندن" },
-                { key: "style", ku: "شێواز" },
-                { key: "subject", ku: "بابەت" },
-                { key: "success", ku: "سەرکەوتن" },
-                { key: "sugar", ku: "شەکر" },
-                { key: "summer", ku: "هاوین" },
-                { key: "sun", ku: "خۆر" },
-                { key: "Sunday", ku: "یەکشەممە" },
-                { key: "supermarket", ku: "سوپەرمارکێت" },
-                { key: "sure", ku: "دڵنیا" },
-                { key: "sweater", ku: "پەڕۆ" },
-                { key: "swim", ku: "مەلە کردن" },
-                { key: "swimming", ku: "مەلە" },
-                { key: "table", ku: "مێز" },
-                { key: "take", ku: "گرتن" },
-                { key: "talk", ku: "قسە کردن" },
-                { key: "tall", ku: "درێژ" },
-                { key: "taxi", ku: "تاکسی" },
-                { key: "tea", ku: "چای" },
-                { key: "teach", ku: "فێر کردن" },
-                { key: "teacher", ku: "مامۆستا" },
-                { key: "team", ku: "تیم" },
-                { key: "teenager", ku: "هەرزەکار" },
-                { key: "telephone", ku: "تەلەفۆن" },
-                { key: "television", ku: "تەلەڤیزیۆن" },
-                { key: "tell", ku: "گوتن" },
-                { key: "ten", ku: "دە" },
-                { key: "tennis", ku: "تێنس" },
-                { key: "terrible", ku: "ترسناک" },
-                { key: "test", ku: "تاقیکردنەوە" },
-                { key: "text", ku: "دەق" },
-                { key: "than", ku: "لە" },
-                { key: "thank", ku: "سوپاس" },
-                { key: "thanks", ku: "سوپاس" },
-                { key: "that", ku: "ئەو" },
-                { key: "the", ku: "ئەو" },
-                { key: "theatre", ku: "شانۆ" },
-                { key: "their", ku: "ئەوان" },
-                { key: "them", ku: "ئەوان" },
-                { key: "then", ku: "ئەوکات" },
-                { key: "there", ku: "لەوێ" },
-                { key: "they", ku: "ئەوان" },
-                { key: "thing", ku: "شت" },
-                { key: "think", ku: "بیر کردن" },
-                { key: "third", ku: "سێیەم" },
-                { key: "thirsty", ku: "تینوو" },
-                { key: "thirteen", ku: "سیانزە" },
-                { key: "thirty", ku: "سی" },
-                { key: "this", ku: "ئەمە" },
-                { key: "thousand", ku: "هەزار" },
-                { key: "three", ku: "سێ" },
-                { key: "through", ku: "لە ڕێگەی" },
-                { key: "Thursday", ku: "پێنجشەممە" },
-                { key: "ticket", ku: "تیکەت" },
-                { key: "time", ku: "کات" },
-                { key: "tired", ku: "ماندوو" },
-                { key: "title", ku: "ناونیشان" },
-                { key: "to", ku: "بۆ" },
-                { key: "today", ku: "ئەمڕۆ" },
-                { key: "together", ku: "پێکەوە" },
-                { key: "toilet", ku: "توالێت" },
-                { key: "tomato", ku: "تەماتە" },
-                { key: "tomorrow", ku: "بەیانی" },
-                { key: "tonight", ku: "ئەمشەو" },
-                { key: "too", ku: "زۆر" },
-                { key: "tooth", ku: "ددان" },
-                { key: "topic", ku: "بابەت" },
-                { key: "tourist", ku: "گەشتیار" },
-                { key: "town", ku: "شارۆچکە" },
-                { key: "traffic", ku: "ترافیک" },
-                { key: "train", ku: "شەمەندەفەر" },
-                { key: "travel", ku: "گەشت" },
-                { key: "tree", ku: "دار" },
-                { key: "trip", ku: "گەشت" },
-                { key: "trousers", ku: "پانتۆڵ" },
-                { key: "true", ku: "راست" },
-                { key: "try", ku: "هەوڵ دان" },
-                { key: "T-shirt", ku: "تی شرت" },
-                { key: "Tuesday", ku: "سێشەممە" },
-                { key: "turn", ku: "سوڕاندن" },
-                { key: "TV", ku: "تی ڤی" },
-                { key: "twelve", ku: "دوازدە" },
-                { key: "twenty", ku: "بیست" },
-                { key: "twice", ku: "دوو جار" },
-                { key: "two", ku: "دوو" },
-                { key: "type", ku: "جۆر" },
-                { key: "umbrella", ku: "چەتری" },
-                { key: "uncle", ku: "مام" },
-                { key: "under", ku: "ژێر" },
-                { key: "understand", ku: "تێگەیشتن" },
-                { key: "university", ku: "زانکۆ" },
-                { key: "until", ku: "تاکوو" },
-                { key: "up", ku: "سەرەوە" },
-                { key: "upstairs", ku: "سەرەوە" },
-                { key: "us", ku: "ئێمە" },
-                { key: "use", ku: "بەکارهێنان" },
-                { key: "useful", ku: "بەسوود" },
-                { key: "usually", ku: "زۆر جار" },
-                { key: "vacation", ku: "پشوو" },
-                { key: "vegetable", ku: "سەوزە" },
-                { key: "very", ku: "زۆر" },
-                { key: "video", ku: "ڤیدیۆ" },
-                { key: "village", ku: "گوند" },
-                { key: "visit", ku: "سەردان" },
-                { key: "visitor", ku: "سەردانکەر" },
-                { key: "wait", ku: "چاوەڕوانی" },
-                { key: "waiter", ku: "خزمەتکار" },
-                { key: "wake", ku: "خەبەر کردن" },
-                { key: "walk", ku: "پیاسە" },
-                { key: "wall", ku: "دیوار" },
-                { key: "want", ku: "خواستن" },
-                { key: "warm", ku: "گەرم" },
-                { key: "wash", ku: "شوشتن" },
-                { key: "watch", ku: "سەیر کردن" },
-                { key: "water", ku: "ئاو" },
-                { key: "way", ku: "ڕێگا" },
-                { key: "we", ku: "ئێمە" },
-                { key: "wear", ku: "لەبەر کردن" },
-                { key: "weather", ku: "کەش و هەوا" },
-                { key: "website", ku: "ماڵپەڕ" },
-                { key: "Wednesday", ku: "چوارشەممە" },
-                { key: "week", ku: "هەفتە" },
-                { key: "weekend", ku: "کۆتایی هەفتە" },
-                { key: "welcome", ku: "بەخێربێی" },
-                { key: "well", ku: "باش" },
-                { key: "west", ku: "ڕۆژئاوا" },
-                { key: "what", ku: "چی" },
-                { key: "when", ku: "کەی" },
-                { key: "where", ku: "لە کوێ" },
-                { key: "which", ku: "کام" },
-                { key: "white", ku: "سپی" },
-                { key: "who", ku: "کێ" },
-                { key: "why", ku: "بۆچی" },
-                { key: "wife", ku: "ژن" },
-                { key: "will", ku: "ئەو" },
-                { key: "win", ku: "بردنەوە" },
-                { key: "window", ku: "پەنجەرە" },
-                { key: "wine", ku: "شەراب" },
-                { key: "winter", ku: "زستان" },
-                { key: "with", ku: "لەگەڵ" },
-                { key: "without", ku: "بێ" },
-                { key: "woman", ku: "ژن" },
-                { key: "wonderful", ku: "سەرسوڕهێنەر" },
-                { key: "word", ku: "وشە" },
-                { key: "work", ku: "کار" },
-                { key: "worker", ku: "کارمەند" },
-                { key: "world", ku: "جیهان" },
-                { key: "would", ku: "ئەو" },
-                { key: "write", ku: "نوسین" },
-                { key: "writer", ku: "نوسەر" },
-                { key: "writing", ku: "نوسین" },
-                { key: "wrong", ku: "هەڵە" },
-                { key: "yeah", ku: "بەڵێ" },
-                { key: "year", ku: "ساڵ" },
-                { key: "yellow", ku: "زەرد" },
-                { key: "yes", ku: "بەڵێ" },
-                { key: "yesterday", ku: "دوێنێ" },
-                { key: "you", ku: "تۆ" },
-                { key: "young", ku: "گەنج" },
-                { key: "your", ku: "تۆ" },
-                { key: "yourself", ku: "خۆت" }
+                { key: "April", ku: "نیسان" }
             ],
             A2: [
                 { key: "water", ku: "ئاڤ" },
@@ -1636,12 +702,6 @@
         let currentIndex = 0;
         let isFlipped = false;
         let currentSpeakLang = 'en'; // Current language for TTS
-        let isRecording = false;
-        let audioChunks = [];
-        let mediaRecorder;
-        let audioContext;
-        let modelAudioBuffer;
-        let userAudioBuffer;
         const ADMIN_PASSWORD = "Hakan123456789";
 
         // DOM elements
@@ -1656,13 +716,6 @@
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         const contactForm = document.getElementById('contact-form');
-        const recordBtn = document.getElementById('record-btn');
-        const playBtn = document.getElementById('play-btn');
-        const recordText = document.getElementById('record-text');
-        const similarityDisplay = document.getElementById('similarity-display');
-        const similarityProgress = document.getElementById('similarity-progress');
-        const similarityText = document.getElementById('similarity-text');
-        const pronunciationTips = document.getElementById('pronunciation-tips');
 
         // Initialize the app
         function init() {
@@ -1671,6 +724,9 @@
                 document.documentElement.classList.add('dark');
                 darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             }
+
+            // Load previous session if available
+            loadUserSession();
 
             // Add event listeners
             document.addEventListener('keydown', (e) => {
@@ -1685,11 +741,10 @@
             document.getElementById('language-toggle').addEventListener('change', toggleLanguage);
             document.getElementById('ad-form').addEventListener('submit', handleAdSubmit);
 
-            // Initialize audio context for pronunciation analysis
-            initAudioContext();
-
-            // Load the first level by default
-            loadLevel('A1');
+            // Show the first level by default if not restored from session
+            if (!currentLevel) {
+                loadLevel('A1');
+            }
             showSection('flashcards');
             
             // Check if admin is already logged in
@@ -1701,15 +756,24 @@
             loadSampleAds();
         }
 
-        // Initialize Web Audio API context
-        function initAudioContext() {
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (e) {
-                console.error('Web Audio API not supported');
-                pronunciationTips.textContent = "Pronunciation analysis not supported in your browser.";
-                recordBtn.disabled = true;
+        // Load user session from localStorage
+        function loadUserSession() {
+            const session = JSON.parse(localStorage.getItem('flashcardSession'));
+            if (session) {
+                currentLevel = session.level;
+                currentCards = [...wordsByLevel[currentLevel]];
+                currentIndex = session.index || 0;
+                loadLevel(currentLevel, true); // Load level without resetting index
             }
+        }
+
+        // Save current session to localStorage
+        function saveUserSession() {
+            const session = {
+                level: currentLevel,
+                index: currentIndex
+            };
+            localStorage.setItem('flashcardSession', JSON.stringify(session));
         }
 
         // Toggle dark mode
@@ -1724,7 +788,7 @@
                 darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
             }
         }
-        
+                
         // Toggle between Kurdish and English for TTS
         function toggleLanguage() {
             currentSpeakLang = document.getElementById('language-toggle').checked ? 'ku' : 'en';
@@ -1772,7 +836,7 @@
             // Reset form
             contactForm.reset();
         }
-        
+                
         // Handle ad form submission
         function handleAdSubmit(e) {
             e.preventDefault();
@@ -1786,7 +850,7 @@
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 const reader = new FileReader();
-                
+                                
                 reader.onload = function(e) {
                     const ad = {
                         id: Date.now(),
@@ -1797,33 +861,33 @@
                         duration: duration,
                         createdAt: new Date().toISOString()
                     };
-                    
+                                    
                     // In a real app, you would save to a database here
                     saveAdToLocalStorage(ad);
                     addAdToAdminPanel(ad);
                     addAdToPublicView(ad);
-                    
+                                    
                     // Reset form
                     document.getElementById('ad-form').reset();
                     showNotification("Advertisement submitted successfully!");
                 };
-                
+                                
                 reader.readAsDataURL(file);
             }
         }
-        
+                
         // Save ad to localStorage (simulating database)
         function saveAdToLocalStorage(ad) {
             let ads = JSON.parse(localStorage.getItem('ads')) || [];
             ads.push(ad);
             localStorage.setItem('ads', JSON.stringify(ads));
         }
-        
+                
         // Load ads from localStorage
         function loadAdsFromLocalStorage() {
             return JSON.parse(localStorage.getItem('ads')) || [];
         }
-        
+                
         // Add ad to admin panel
         function addAdToAdminPanel(ad) {
             const adminActiveAds = document.getElementById('admin-active-ads');
@@ -1853,7 +917,7 @@
             
             adminActiveAds.prepend(adItem);
         }
-        
+                
         // Add ad to public view
         function addAdToPublicView(ad) {
             const activeAds = document.getElementById('active-ads');
@@ -1879,7 +943,7 @@
             
             activeAds.prepend(adItem);
         }
-        
+                
         // Get appropriate HTML for ad media type
         function getMediaHTML(ad) {
             if (ad.mediaType === 'video') {
@@ -1899,7 +963,7 @@
                 return `<img src="${ad.mediaUrl}" alt="${ad.title}" class="w-full h-full object-cover">`;
             }
         }
-        
+                
         // Delete an ad
         function deleteAd(id) {
             let ads = loadAdsFromLocalStorage();
@@ -1917,7 +981,7 @@
             
             showNotification("Advertisement deleted successfully!");
         }
-        
+                
         // Load sample ads (for demo)
         function loadSampleAds() {
             // Only load if none exist
@@ -1931,7 +995,7 @@
                     duration: 30,
                     createdAt: new Date().toISOString()
                 };
-                
+                                
                 saveAdToLocalStorage(sampleAd);
             }
             
@@ -1941,7 +1005,7 @@
                 const activeAds = document.getElementById('active-ads');
                 activeAds.innerHTML = '';
                 ads.forEach(ad => addAdToPublicView(ad));
-                
+                                
                 // If admin is logged in, show in admin panel
                 if (localStorage.getItem('adminLoggedIn') === 'true') {
                     const adminActiveAds = document.getElementById('admin-active-ads');
@@ -1950,7 +1014,7 @@
                 }
             }
         }
-        
+                
         // Admin login
         function loginAdmin(silent = false) {
             const password = document.getElementById('admin-password').value;
@@ -1960,19 +1024,19 @@
                 document.getElementById('public-ads').classList.add('hidden');
                 document.getElementById('admin-ads').classList.remove('hidden');
                 document.getElementById('password-error').classList.add('hidden');
-                
+                                
                 if (!silent) {
                     localStorage.setItem('adminLoggedIn', 'true');
                     showNotification("Logged in as administrator");
                 }
-                
+                                
                 return true;
             } else {
                 document.getElementById('password-error').classList.remove('hidden');
                 return false;
             }
         }
-        
+                
         // Admin logout
         function logoutAdmin() {
             document.getElementById('password-prompt').classList.remove('hidden');
@@ -1989,179 +1053,44 @@
             e.stopPropagation(); // Prevent card flip
             
             if (currentCards.length === 0) return;
-            
+
             const speech = new SpeechSynthesisUtterance();
             speech.lang = lang === 'ku' ? 'ar' : 'en-US'; // Kurdish is typically in Arabic script
-            
-            // Save the language for pronunciation comparison
-            currentSpeakLang = lang;
-            
+
             // Speak the appropriate word
             speech.text = lang === 'ku' ? 
                 currentCards[currentIndex].ku : 
                 currentCards[currentIndex].key;
-            
-            // Optionally save this as model audio for comparison (if we had recording capability)
+
             window.speechSynthesis.speak(speech);
-            
-            // Store the text for pronunciation tips
-            updatePronunciationTips(lang === 'ku' ? 
-                currentCards[currentIndex].ku : 
-                currentCards[currentIndex].key, lang);
-        }
-        
-        // Update pronunciation tips based on current word
-        function updatePronunciationTips(word, lang) {
-            if (lang === 'ku') {
-                pronunciationTips.innerHTML = `
-                    <strong>Kurdish Pronunciation Tip:</strong> 
-                    ${getKurdishPronunciationTip(word)}
-                `;
-            } else {
-                pronunciationTips.innerHTML = `
-                    <strong>English Pronunciation Tip:</strong> 
-                    ${getEnglishPronunciationTip(word)}
-                `;
-            }
-        }
-        
-        // Simple Kurdish pronunciation tips
-        function getKurdishPronunciationTip(word) {
-            if (word.includes("ۆ")) {
-                return "The 'ۆ' sound is similar to the 'o' in 'more'. Round your lips when pronouncing it.";
-            }
-            if (word.includes("ێ")) {
-                return "The 'ێ' sound is similar to the 'e' in 'bed' but held longer.";
-            }
-            if (word.includes("ڕ")) {
-                return "The 'ڕ' is a rolled 'r' sound, similar to Spanish 'rr'.";
-            }
-            return "Kurdish is phonetic - each letter usually has one sound. Try to pronounce each letter clearly.";
-        }
-        
-        // Simple English pronunciation tips
-        function getEnglishPronunciationTip(word) {
-            if (word.length > 6) {
-                return "Longer words often have stress on certain syllables. Try breaking the word into parts.";
-            }
-            if (word.includes("th")) {
-                return "The 'th' sound is made by placing the tongue between the teeth. Practice with words like 'this' and 'think'.";
-            }
-            return "English words often have silent letters. Listen carefully to the model pronunciation.";
-        }
-
-        // Toggle recording state
-        function toggleRecording() {
-            if (!audioContext) {
-                showNotification("Audio recording not supported in your browser");
-                return;
-            }
-            
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
-        }
-        
-        // Start recording user's pronunciation
-        function startRecording() {
-            audioChunks = [];
-            isRecording = true;
-            recordText.textContent = "Stop";
-            recordBtn.classList.add('recording');
-            playBtn.disabled = true;
-            similarityDisplay.classList.add('hidden');
-            
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.ondataavailable = e => {
-                        audioChunks.push(e.data);
-                    };
-                    mediaRecorder.onstop = processRecording;
-                    mediaRecorder.start();
-                })
-                .catch(err => {
-                    console.error("Error accessing microphone:", err);
-                    showNotification("Error accessing microphone. Please check permissions.");
-                    isRecording = false;
-                    recordText.textContent = "Record";
-                    recordBtn.classList.remove('recording');
-                });
-        }
-        
-        // Stop recording
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                isRecording = false;
-                recordText.textContent = "Record";
-                recordBtn.classList.remove('recording');
-                
-                // Stop all tracks from the stream
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            }
-        }
-        
-        // Process the recorded audio
-        function processRecording() {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            
-            // Enable play button
-            playBtn.disabled = false;
-            playBtn.onclick = function() {
-                new Audio(audioUrl).play();
-            };
-            
-            // In a real app, you would compare with the model pronunciation here
-            // This is a simplified simulation
-            setTimeout(() => {
-                const similarity = Math.floor(Math.random() * 30) + 70; // Random 70-100%
-                similarityProgress.style.width = `${similarity}%`;
-                
-                if (similarity > 85) {
-                    similarityText.textContent = `Excellent! Your pronunciation is ${similarity}% similar to the model.`;
-                    similarityProgress.style.backgroundColor = "#10b981";
-                } else if (similarity > 70) {
-                    similarityText.textContent = `Good! Your pronunciation is ${similarity}% similar to the model. Keep practicing!`;
-                    similarityProgress.style.backgroundColor = "#84cc16";
-                } else {
-                    similarityText.textContent = `Your pronunciation is ${similarity}% similar to the model. Listen to the model and try again.`;
-                    similarityProgress.style.backgroundColor = "#ef4444";
-                }
-                
-                similarityDisplay.classList.remove('hidden');
-            }, 1000);
-        }
-
-        // Play the recording (placeholder)
-        function playRecording() {
-            if (audioChunks.length > 0) {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                new Audio(audioUrl).play();
-            }
         }
 
         // Load cards for a specific level
-        function loadLevel(level) {
+        function loadLevel(level, keepPosition = false) {
             currentLevel = level;
             currentCards = [...wordsByLevel[level]];
-            currentIndex = 0;
-            isFlipped = false;
             
+            if (!keepPosition) {
+                currentIndex = 0;
+            }
+            
+            isFlipped = false;
+
             // Reset card rotation
             cardElement.classList.remove('flipped');
-            
+
             // Update UI
             updateCard();
             updateProgress();
             updateNavButtons();
             
+            // Save session
+            saveUserSession();
+
             // Show notification
-            showNotification(`Loaded ${level} level with ${currentCards.length} cards`);
+            if (!keepPosition) {
+                showNotification(`Loaded ${level} level with ${currentCards.length} cards`);
+            }
         }
 
         // Update the current card display
@@ -2171,19 +1100,12 @@
             const card = currentCards[currentIndex];
             frontTextElement.textContent = card.key;
             backTextElement.textContent = card.ku;
-            
+
             // Reset to front face
             if (isFlipped) {
                 cardElement.classList.remove('flipped');
                 isFlipped = false;
             }
-            
-            // Reset pronunciation practice
-            playBtn.disabled = true;
-            similarityDisplay.classList.add('hidden');
-            
-            // Update pronunciation tips for English by default
-            updatePronunciationTips(card.key, 'en');
         }
 
         // Flip the current card
@@ -2192,6 +1114,9 @@
             
             isFlipped = !isFlipped;
             cardElement.classList.toggle('flipped', isFlipped);
+            
+            // Save session on interaction
+            saveUserSession();
         }
 
         // Go to the next card
@@ -2203,6 +1128,9 @@
                 updateCard();
                 updateProgress();
                 updateNavButtons();
+                
+                // Save session on interaction
+                saveUserSession();
             } else {
                 showNotification("You've reached the end of the deck!");
             }
@@ -2217,6 +1145,9 @@
                 updateCard();
                 updateProgress();
                 updateNavButtons();
+                
+                // Save session on interaction
+                saveUserSession();
             } else {
                 showNotification("This is the first card!");
             }
@@ -2234,6 +1165,10 @@
             currentIndex = 0;
             updateCard();
             updateProgress();
+            
+            // Save session
+            saveUserSession();
+            
             showNotification("Cards shuffled!");
         }
 
