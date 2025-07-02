@@ -3,306 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Learning System</title>
+    <title>Flash Card - Learn English</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .flip-card {
+        .card {
             perspective: 1000px;
+            width: 300px;
+            height: 400px;
         }
-        .flip-card-inner {
-            transition: transform 0.6s;
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
             transform-style: preserve-3d;
         }
-        .flip-card:hover .flip-card-inner {
+        .card.flipped .card-inner {
             transform: rotateY(180deg);
         }
-        .flip-card-front, .flip-card-back {
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
             backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
-        .flip-card-back {
+        .card-back {
             transform: rotateY(180deg);
         }
-        .level-card {
-            transition: all 0.3s ease;
+        .welcome-animation {
+            animation: fadeInOut 3s forwards;
         }
-        .level-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.8); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.8); visibility: hidden; }
         }
-        .count-up {
-            animation: countUp 2s ease-out;
+        .slide-in {
+            animation: slideIn 0.5s forwards;
         }
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .dark .card-front {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+        .dark .card-back {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+        }
+        .light .card-front {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        .light .card-back {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <!-- Loading Screen -->
-    <div id="loading" class="fixed inset-0 bg-indigo-900 flex flex-col items-center justify-center z-50 transition-opacity duration-1000">
-        <div class="animate-pulse flex flex-col items-center">
-            <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-6">
-                <i class="fas fa-language text-6xl text-indigo-900"></i>
-            </div>
-            <h1 class="text-4xl font-bold text-white mb-2">English Learning System</h1>
-            <p class="text-white text-lg">Loading your learning experience...</p>
+<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Welcome Animation -->
+    <div id="welcome" class="welcome-animation fixed inset-0 z-50 flex items-center justify-center bg-gray-900 text-white">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">✨ Flash Card ✨</h1>
+            <p class="text-xl md:text-2xl">Learn English the Smart Way!</p>
         </div>
     </div>
 
-    <!-- Main Content (hidden initially) -->
-    <div id="main-content" class="hidden">
-        <!-- Visitor Counter -->
-        <div class="bg-indigo-800 text-white py-2 px-4 text-center">
-            <p>Visitors: <span id="visitor-count" class="font-bold">0</span></p>
-        </div>
-
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-8 px-4 text-center shadow-lg">
-            <h1 class="text-4xl font-bold mb-2">English Learning System</h1>
-            <p class="text-xl">Master English at your own pace</p>
-        </header>
-
-        <!-- Navigation -->
-        <nav class="bg-white shadow-md sticky top-0 z-10">
-            <div class="container mx-auto px-4">
-                <div class="flex justify-between items-center py-4">
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-indigo-700 font-medium hover:text-indigo-900 transition">Home</a>
-                        <a href="#about" class="text-gray-600 hover:text-indigo-700 transition">About Me</a>
-                        <a href="#contact" class="text-gray-600 hover:text-indigo-700 transition">Contact Me</a>
+    <!-- Main Container -->
+    <div id="main-content" class="min-h-screen" style="display: none;">
+        <!-- Navigation Bar -->
+        <nav class="bg-white dark:bg-gray-800 shadow-lg fixed w-full z-40">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center">
+                        <span class="text-xl font-semibold text-gray-800 dark:text-white">Flash Card</span>
                     </div>
-                    <div class="flex space-x-2">
-                        <button id="dark-mode" class="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700 transition">
-                            <i class="fas fa-moon"></i> Dark
+                    
+                    <!-- Primary Nav -->
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a href="#home" class="nav-link">Home</a>
+                        <a href="#about" class="nav-link">About Me</a>
+                        <a href="#contact" class="nav-link">Contact</a>
+                        <a href="#levels" class="nav-link">Levels</a>
+                        
+                        <!-- Theme Toggle -->
+                        <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden"></i>
+                            <i class="fas fa-sun hidden dark:block"></i>
                         </button>
-                        <button id="light-mode" class="bg-white text-gray-800 px-3 py-1 rounded-md hover:bg-gray-100 transition border border-gray-300">
-                            <i class="fas fa-sun"></i> Light
+                        
+                        <!-- Visitor Counter -->
+                        <div class="flex items-center ml-4">
+                            <i class="fas fa-users mr-2 text-gray-600 dark:text-gray-300"></i>
+                            <span id="visitor-count" class="font-medium text-gray-700 dark:text-gray-200">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile button -->
+                    <div class="md:hidden flex items-center">
+                        <button id="mobile-menu-button" class="p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i class="fas fa-bars"></i>
                         </button>
                     </div>
                 </div>
             </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 pb-4 px-4">
+                <a href="#home" class="block py-2 nav-link">Home</a>
+                <a href="#about" class="block py-2 nav-link">About Me</a>
+                <a href="#contact" class="block py-2 nav-link">Contact</a>
+                <a href="#levels" class="block py-2 nav-link">Levels</a>
+                <div class="flex items-center justify-between py-2">
+                    <span class="text-gray-700 dark:text-gray-200">Theme:</span>
+                    <button id="mobile-theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                </div>
+                <div class="flex items-center py-2">
+                    <i class="fas fa-users mr-2 text-gray-600 dark:text-gray-300"></i>
+                    <span id="mobile-visitor-count" class="font-medium text-gray-700 dark:text-gray-200">0</span>
+                </div>
+            </div>
         </nav>
 
-        <!-- Main Sections -->
-        <main class="container mx-auto px-4 py-8">
-            <!-- Levels Section -->
-            <section id="levels" class="mb-12">
-                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Choose Your English Level</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Level 1 -->
-                    <div class="level-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Beginner</span>
-                                <span class="text-yellow-500">
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">Level 1: Basic Words</h3>
-                            <p class="text-gray-600 mb-4">Start with fundamental vocabulary and simple sentences.</p>
-                            <button onclick="openLevel(1)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                                Start Learning
-                            </button>
+        <!-- Main Content -->
+        <main class="pt-20 pb-12 px-4 max-w-6xl mx-auto">
+            <!-- Home Section -->
+            <section id="home" class="py-12">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">Welcome to Flash Card</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                        An interactive platform to learn English vocabulary through flashcards and quizzes.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="text-blue-500 dark:text-blue-400 text-4xl mb-4">
+                            <i class="fas fa-layer-group"></i>
                         </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">6 Levels</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            From beginner (A1) to mastery (C2), structured vocabulary learning.
+                        </p>
                     </div>
-
-                    <!-- Level 2 -->
-                    <div class="level-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Elementary</span>
-                                <span class="text-yellow-500">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">Level 2: Common Phrases</h3>
-                            <p class="text-gray-600 mb-4">Learn everyday expressions and basic conversations.</p>
-                            <button onclick="openLevel(2)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                                Start Learning
-                            </button>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="text-green-500 dark:text-green-400 text-4xl mb-4">
+                            <i class="fas fa-flask"></i>
                         </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Interactive Quizzes</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Test your knowledge with customizable quizzes for each level.
+                        </p>
                     </div>
-
-                    <!-- Level 3 -->
-                    <div class="level-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Intermediate</span>
-                                <span class="text-yellow-500">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">Level 3: Grammar Basics</h3>
-                            <p class="text-gray-600 mb-4">Understand sentence structures and verb tenses.</p>
-                            <button onclick="openLevel(3)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                                Start Learning
-                            </button>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="text-purple-500 dark:text-purple-400 text-4xl mb-4">
+                            <i class="fas fa-headphones"></i>
                         </div>
-                    </div>
-
-                    <!-- Level 4 -->
-                    <div class="level-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-0.5 rounded">Upper Intermediate</span>
-                                <span class="text-yellow-500">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">Level 4: Complex Sentences</h3>
-                            <p class="text-gray-600 mb-4">Master compound and complex sentence structures.</p>
-                            <button onclick="openLevel(4)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                                Start Learning
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Level 5 -->
-                    <div class="level-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Advanced</span>
-                                <span class="text-yellow-500">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">Level 5: Academic English</h3>
-                            <p class="text-gray-600 mb-4">Learn formal language for academic and professional settings.</p>
-                            <button onclick="openLevel(5)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                                Start Learning
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Quiz Section -->
-                    <div class="level-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded">Assessment</span>
-                                <span class="text-purple-500">
-                                    <i class="fas fa-question-circle"></i>
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800 mb-2">Test Your Knowledge</h3>
-                            <p class="text-gray-600 mb-4">Take quizzes to evaluate your English proficiency.</p>
-                            <button onclick="openQuizModal()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition">
-                                Start Quiz
-                            </button>
-                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Audio Support</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Listen to pronunciations to improve your speaking skills.
+                        </p>
                     </div>
                 </div>
             </section>
 
             <!-- About Me Section -->
-            <section id="about" class="mb-12 bg-white rounded-xl shadow-md p-6">
-                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">About Me</h2>
-                <div class="flex flex-col md:flex-row items-center gap-8">
-                    <div class="w-full md:w-1/3 flex justify-center">
-                        <div class="w-48 h-48 rounded-full overflow-hidden border-4 border-indigo-500 shadow-lg">
-                            <img src="[![4-D51-CC0-E-2679-4375-9-F07-C5-F58-D71870-F.jpg](https://i.postimg.cc/VsCtgG7x/4-D51-CC0-E-2679-4375-9-F07-C5-F58-D71870-F.jpg)](https://postimg.cc/PNdNr4ny)" alt="Aland Luqman Abd" class="w-full h-full object-cover">
+            <section id="about" class="py-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-12">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">About Me</h2>
+                    
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <div class="w-full md:w-1/3 flex justify-center">
+                            <div class="relative">
+                                <img src="https://via.placeholder.com/300" alt="Profile" class="w-48 h-48 rounded-full object-cover border-4 border-blue-500 dark:border-blue-400 shadow-lg">
+                                <div class="absolute -bottom-3 -right-3 bg-blue-500 dark:bg-blue-600 text-white rounded-full p-3 shadow-lg">
+                                    <i class="fas fa-graduation-cap text-xl"></i>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="w-full md:w-2/3">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Aland Luqman Abd</h3>
-                        <p class="text-gray-600 mb-4">IT Student at Tişk University</p>
-                        <p class="text-gray-700 mb-4">
-                           👋 Welcome to my website!
-My name is Aland Luqman Abd, a passionate and dedicated programming student at TIU (Tishk International University), currently in my 2nd year of studies.
-
-💻 I specialize in building interactive web systems using HTML, CSS, JavaScript, and other modern web technologies. I’m especially interested in developing educational tools, flashcard systems, and smart interfaces that make learning easier and more fun.
-
-🧠 My goal is to use my skills to create useful, smart, and beautifully designed digital solutions for learners and everyday users.
-
-📈 I’m always learning and experimenting with new ideas. If you’re interested in my work, feel free to explore my projects, contact me, or follow me on my social platforms below.
-                       </p>
-                        <div class="mb-4">
-                            <h4 class="font-bold text-gray-800 mb-2">Technical Skills:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">Python</span>
-                                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">JavaScript</span>
-                                <span class="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full">HTML</span>
-                                <span class="bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">CSS</span>
-                                <span class="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">SQL</span>
-                                <span class="bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full">Java</span>
-                                <span class="bg-indigo-100 text-indigo-800 text-sm px-3 py-1 rounded-full">React</span>
-                                <span class="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full">Node.js</span>
+                        
+                        <div class="w-full md:w-2/3">
+                            <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-4">Aland Luqman Abd</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">
+                                Second-year Information Technology student at Tishk International University (TIU) with a passion for web development and educational tools.
+                            </p>
+                            
+                            <div class="mb-4">
+                                <h4 class="text-lg font-medium text-gray-800 dark:text-white mb-2">Skills:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">Python</span>
+                                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">HTML/CSS</span>
+                                    <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full">JavaScript</span>
+                                    <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full">C/C++</span>
+                                    <span class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full">SQL</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-800 dark:text-white mb-2">Education:</h4>
+                                <div class="flex items-center text-gray-600 dark:text-gray-300">
+                                    <i class="fas fa-university mr-2"></i>
+                                    <span>Tishk International University (2021 - Present)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Contact Me Section -->
-            <section id="contact" class="bg-white rounded-xl shadow-md p-6 mb-12">
-                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Contact Me</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Get in Touch</h3>
-                        <p class="text-gray-600 mb-6">
-                            Have questions or suggestions about the English learning system? Feel free to reach out through any of these platforms.
-                        </p>
-                        <div class="space-y-4">
-                            <div class="flex items-center">
-                                <div class="bg-indigo-100 p-3 rounded-full mr-4">
-                                    <i class="fas fa-envelope text-indigo-600"></i>
+            <!-- Contact Section -->
+            <section id="contact" class="py-12">
+                <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">Contact Me</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+                    <a href="#" class="contact-card bg-yellow-100 dark:bg-yellow-900">
+                        <div class="contact-icon bg-yellow-500 dark:bg-yellow-600">
+                            <i class="fab fa-snapchat"></i>
+                        </div>
+                        <span class="contact-text text-yellow-800 dark:text-yellow-200">@aland_luqman</span>
+                    </a>
+                    
+                    <a href="tel:+1234567890" class="contact-card bg-green-100 dark:bg-green-900">
+                        <div class="contact-icon bg-green-500 dark:bg-green-600">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <span class="contact-text text-green-800 dark:text-green-200">+123 456 7890</span>
+                    </a>
+                    
+                    <a href="#" class="contact-card bg-blue-100 dark:bg-blue-900">
+                        <div class="contact-icon bg-blue-500 dark:bg-blue-600">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <span class="contact-text text-blue-800 dark:text-blue-200">@alandluqman</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Levels Section -->
+            <section id="levels" class="py-12">
+                <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">Vocabulary Levels</h2>
+                
+                <div class="mb-8">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+                            <thead class="bg-gray-100 dark:bg-gray-700">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-gray-700 dark:text-gray-200 font-semibold">Level</th>
+                                    <th class="py-3 px-4 text-left text-gray-700 dark:text-gray-200 font-semibold">CEFR Category</th>
+                                    <th class="py-3 px-4 text-left text-gray-700 dark:text-gray-200 font-semibold">Words</th>
+                                    <th class="py-3 px-4 text-left text-gray-700 dark:text-gray-200 font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr>
+                                    <td class="py-3 px-4 text-gray-800 dark:text-gray-200">A1</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">Beginner</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">10</td>
+                                    <td class="py-3 px-4">
+                                        <button class="level-btn bg-blue-500 hover:bg-blue-600" data-level="a1">Start Learning</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-gray-800 dark:text-gray-200">A2</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">Elementary</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">10</td>
+                                    <td class="py-3 px-4">
+                                        <button class="level-btn bg-green-500 hover:bg-green-600" data-level="a2">Start Learning</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-gray-800 dark:text-gray-200">B1</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">Intermediate</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">10</td>
+                                    <td class="py-3 px-4">
+                                        <button class="level-btn bg-yellow-500 hover:bg-yellow-600" data-level="b1">Start Learning</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-gray-800 dark:text-gray-200">B2</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">Upper-Intermediate</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">10</td>
+                                    <td class="py-3 px-4">
+                                        <button class="level-btn bg-orange-500 hover:bg-orange-600" data-level="b2">Start Learning</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-gray-800 dark:text-gray-200">C1</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">Advanced</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">10</td>
+                                    <td class="py-3 px-4">
+                                        <button class="level-btn bg-purple-500 hover:bg-purple-600" data-level="c1">Start Learning</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-gray-800 dark:text-gray-200">C2</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">Mastery</td>
+                                    <td class="py-3 px-4 text-gray-600 dark:text-gray-300">10</td>
+                                    <td class="py-3 px-4">
+                                        <button class="level-btn bg-red-500 hover:bg-red-600" data-level="c2">Start Learning</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Flashcard Display Area -->
+                <div id="flashcard-container" class="hidden">
+                    <div class="flex flex-col items-center">
+                        <div class="mb-8 text-center">
+                            <h3 id="current-level" class="text-2xl font-bold text-gray-800 dark:text-white mb-2"></h3>
+                            <p id="level-description" class="text-gray-600 dark:text-gray-300"></p>
+                        </div>
+                        
+                        <div class="card mb-8">
+                            <div class="card-inner">
+                                <div class="card-front flex flex-col items-center justify-center text-white">
+                                    <h4 class="text-3xl font-bold mb-4" id="card-word">Word</h4>
+                                    <button class="audio-btn p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30">
+                                        <i class="fas fa-volume-up text-xl"></i>
+                                    </button>
                                 </div>
-                                <div>
-                                    <p class="text-gray-600">Email</p>
-                                    <a href="mailto:aland@example.com" class="text-indigo-600 font-medium">aland@example.com</a>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="bg-yellow-100 p-3 rounded-full mr-4">
-                                    <i class="fas fa-phone text-yellow-600"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600">Phone</p>
-                                    <a href="tel:+964 7809368041" class="text-indigo-600 font-medium">+964 7809368041</a>
+                                <div class="card-back flex flex-col items-center justify-center text-white">
+                                    <h4 class="text-2xl font-bold mb-2" id="card-translation">Translation</h4>
+                                    <p class="text-center mb-4 text-white text-opacity-80" id="card-example">Example sentence</p>
+                                    <button class="audio-btn p-3 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30">
+                                        <i class="fas fa-volume-up text-xl"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="flex space-x-4 mb-8">
+                            <button id="prev-card" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button id="next-card" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                Next <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="w-full max-w-md">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
+                                <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Progress</h4>
+                                <div class="flex items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-300 mr-2">Card:</span>
+                                    <span id="card-counter" class="font-medium text-gray-800 dark:text-white">1/10</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <button id="take-quiz" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
+                                <i class="fas fa-question-circle mr-2"></i> Take Quiz
+                            </button>
+                            <button id="back-to-levels" class="ml-4 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium">
+                                <i class="fas fa-list mr-2"></i> Back to Levels
+                            </button>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Social Media</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="https://snapchat.com/t/oEapEryn" target="_blank" class="bg-yellow-100 hover:bg-yellow-200 rounded-lg p-4 flex flex-col items-center transition">
-                                <i class="fab fa-snapchat text-yellow-600 text-3xl mb-2"></i>
-                                <span class="font-medium">Snapchat</span>
-                            </a>
-                            <a href="https://t.me/alandluqman" target="_blank" class="bg-blue-100 hover:bg-blue-200 rounded-lg p-4 flex flex-col items-center transition">
-                                <i class="fab fa-telegram text-blue-600 text-3xl mb-2"></i>
-                                <span class="font-medium">Telegram</span>
-                            </a>
-                            <a href="https://wa.me/07809368041" target="_blank" class="bg-green-100 hover:bg-green-200 rounded-lg p-4 flex flex-col items-center transition">
-                                <i class="fab fa-whatsapp text-green-600 text-3xl mb-2"></i>
-                                <span class="font-medium">WhatsApp</span>
-                            </a>
-                            <a href="https://www.linkedin.com/in/alandluqman" target="_blank" class="bg-blue-200 hover:bg-blue-300 rounded-lg p-4 flex flex-col items-center transition">
-                                <i class="fab fa-linkedin text-blue-800 text-3xl mb-2"></i>
-                                <span class="font-medium">LinkedIn</span>
-                            </a>
+                </div>
+                
+                <!-- Quiz Modal -->
+                <div id="quiz-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Quiz Settings</h3>
+                                <button id="close-quiz-modal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 dark:text-gray-300 mb-2">Select Level:</label>
+                                <select id="quiz-level" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                                    <option value="a1">A1 - Beginner</option>
+                                    <option value="a2">A2 - Elementary</option>
+                                    <option value="b1">B1 - Intermediate</option>
+                                    <option value="b2">B2 - Upper-Intermediate</option>
+                                    <option value="c1">C1 - Advanced</option>
+                                    <option value="c2">C2 - Mastery</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 dark:text-gray-300 mb-2">Number of Questions:</label>
+                                <select id="quiz-count" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex justify-end">
+                                <button id="start-quiz" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                    Start Quiz <i class="fas fa-play ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quiz Display Area -->
+                <div id="quiz-container" class="hidden">
+                    <div class="flex flex-col items-center">
+                        <div class="mb-8 text-center">
+                            <h3 id="quiz-title" class="text-2xl font-bold text-gray-800 dark:text-white mb-2"></h3>
+                            <div class="flex justify-center items-center">
+                                <span id="quiz-progress" class="font-medium text-gray-600 dark:text-gray-300"></span>
+                                <div class="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mx-4">
+                                    <div id="quiz-progress-bar" class="bg-blue-500 h-2.5 rounded-full"></div>
+                                </div>
+                                <span id="quiz-timer" class="font-medium text-gray-600 dark:text-gray-300">00:00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                            <h4 id="quiz-question" class="text-xl font-semibold text-gray-800 dark:text-white mb-6"></h4>
+                            
+                            <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Options will be inserted here by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button id="submit-quiz" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
+                                Submit Answer
+                            </button>
+                            <button id="quit-quiz" class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium">
+                                Quit Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quiz Results -->
+                <div id="quiz-results" class="hidden">
+                    <div class="flex flex-col items-center">
+                        <div class="text-center mb-8">
+                            <h3 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">Quiz Results</h3>
+                            <div class="text-5xl font-bold text-blue-500 mb-2" id="quiz-score">0%</div>
+                            <div class="text-xl text-gray-600 dark:text-gray-300" id="quiz-result-message"></div>
+                        </div>
+                        
+                        <div class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                            <div class="flex justify-between mb-6">
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white">Details</h4>
+                                    <p class="text-gray-600 dark:text-gray-300" id="quiz-level-result"></p>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white">Time</h4>
+                                    <p class="text-gray-600 dark:text-gray-300" id="quiz-time-result">00:00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-700 dark:text-gray-300">Correct Answers:</span>
+                                    <span id="correct-answers" class="font-medium text-green-500">0</span>
+                                </div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-gray-700 dark:text-gray-300">Wrong Answers:</span>
+                                    <span id="wrong-answers" class="font-medium text-red-500">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-700 dark:text-gray-300">Total Questions:</span>
+                                    <span id="total-questions" class="font-medium text-blue-500">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-6">
+                                <div id="results-progress-bar" class="bg-gradient-to-r from-green-500 to-blue-500 h-4 rounded-full"></div>
+                            </div>
+                            
+                            <div id="quiz-feedback" class="text-gray-600 dark:text-gray-300 mb-6">
+                                <!-- Feedback will be inserted here -->
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button id="review-quiz" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">
+                                <i class="fas fa-redo mr-2"></i> Review
+                            </button>
+                            <button id="new-quiz" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-medium">
+                                <i class="fas fa-plus mr-2"></i> New Quiz
+                            </button>
+                            <button id="back-to-home" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium">
+                                <i class="fas fa-home mr-2"></i> Home
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -310,771 +518,553 @@ My name is Aland Luqman Abd, a passionate and dedicated programming student at T
         </main>
 
         <!-- Footer -->
-        <footer class="bg-gray-800 text-white py-8">
-            <div class="container mx-auto px-4">
+        <footer class="bg-white dark:bg-gray-800 shadow-inner py-6">
+            <div class="max-w-6xl mx-auto px-4">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <div class="mb-4 md:mb-0">
-                        <h3 class="text-xl font-bold">English Learning System</h3>
-                        <p class="text-gray-400">Master English at your own pace</p>
+                        <span class="text-gray-700 dark:text-gray-300">© 2023 Flash Card. All rights reserved.</span>
                     </div>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition">
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                             <i class="fab fa-github"></i>
                         </a>
                     </div>
-                </div>
-                <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400">
-                    <p>&copy; 2023 English Learning System. All rights reserved.</p>
                 </div>
             </div>
         </footer>
     </div>
 
-    <!-- Level Modal -->
-    <div id="level-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="level-title" class="text-2xl font-bold text-gray-800">Level 1: Basic Words</h3>
-                    <button onclick="closeLevelModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="mb-6">
-                    <label for="word-count" class="block text-gray-700 font-medium mb-2">Number of words to learn:</label>
-                    <select id="word-count" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="5">5 words</option>
-                        <option value="10" selected>10 words</option>
-                        <option value="15">15 words</option>
-                        <option value="20">20 words</option>
-                    </select>
-                </div>
-                
-                <div class="flex justify-center mb-8">
-                    <div class="flip-card w-64 h-64">
-                        <div class="flip-card-inner w-full h-full">
-                            <div class="flip-card-front bg-green-500 rounded-xl shadow-lg flex flex-col items-center justify-center p-6 text-white">
-                                <h4 id="current-word" class="text-3xl font-bold mb-4 text-center">Hello</h4>
-                                <button onclick="speakWord()" class="bg-white text-green-600 rounded-full p-3 hover:bg-gray-100 transition">
-                                    <i class="fas fa-volume-up"></i>
-                                </button>
-                            </div>
-                            <div class="flip-card-back bg-indigo-500 rounded-xl shadow-lg flex flex-col items-center justify-center p-6 text-white">
-                                <h4 id="word-meaning" class="text-xl font-bold mb-2 text-center">سڵاو</h4>
-                                <p id="word-example" class="text-sm text-center mb-4">Hello, how are you today?</p>
-                                <button onclick="speakWord()" class="bg-white text-indigo-600 rounded-full p-3 hover:bg-gray-100 transition">
-                                    <i class="fas fa-volume-up"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <div>
-                        <span id="word-progress" class="font-medium">1/10</span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button id="prev-word" onclick="prevWord()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition disabled:opacity-50" disabled>
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <button id="next-word" onclick="nextWord()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quiz Modal -->
-    <div id="quiz-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-2xl font-bold text-gray-800">Quiz Settings</h3>
-                    <button onclick="closeQuizModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-gray-700 font-medium mb-2">Select Quiz Level:</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="selectQuizLevel(1)" class="bg-green-100 hover:bg-green-200 text-green-800 font-medium py-3 px-4 rounded-md transition text-left">
-                            <span class="font-bold">Level 1</span> - Beginner
-                        </button>
-                        <button onclick="selectQuizLevel(2)" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-3 px-4 rounded-md transition text-left">
-                            <span class="font-bold">Level 2</span> - Elementary
-                        </button>
-                        <button onclick="selectQuizLevel(3)" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-medium py-3 px-4 rounded-md transition text-left">
-                            <span class="font-bold">Level 3</span> - Intermediate
-                        </button>
-                        <button onclick="selectQuizLevel(4)" class="bg-orange-100 hover:bg-orange-200 text-orange-800 font-medium py-3 px-4 rounded-md transition text-left">
-                            <span class="font-bold">Level 4</span> - Upper Intermediate
-                        </button>
-                        <button onclick="selectQuizLevel(5)" class="bg-red-100 hover:bg-red-200 text-red-800 font-medium py-3 px-4 rounded-md transition text-left">
-                            <span class="font-bold">Level 5</span> - Advanced
-                        </button>
-                        <button onclick="selectQuizLevel('mixed')" class="bg-purple-100 hover:bg-purple-200 text-purple-800 font-medium py-3 px-4 rounded-md transition text-left">
-                            <span class="font-bold">Mixed</span> - All Levels
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mb-6">
-                    <label for="quiz-question-count" class="block text-gray-700 font-medium mb-2">Number of questions:</label>
-                    <select id="quiz-question-count" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="5">5 questions</option>
-                        <option value="10" selected>10 questions</option>
-                        <option value="15">15 questions</option>
-                        <option value="20">20 questions</option>
-                    </select>
-                </div>
-                
-                <button onclick="startQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-md transition">
-                    Start Quiz
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quiz Question Modal -->
-    <div id="quiz-question-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="quiz-level-title" class="text-xl font-bold text-gray-800">Quiz: Level 1</h3>
-                    <div>
-                        <span id="quiz-progress" class="font-medium text-gray-600">1/10</span>
-                    </div>
-                </div>
-                
-                <div class="mb-6 bg-gray-50 p-4 rounded-lg">
-                    <p id="quiz-question" class="text-lg font-medium mb-4">What is the meaning of "Hello" in Kurdish?</p>
-                    
-                    <div class="space-y-3">
-                        <button onclick="selectAnswer(1)" class="w-full text-left bg-white hover:bg-gray-100 border border-gray-200 rounded-md px-4 py-3 transition">
-                            A) سڵاو
-                        </button>
-                        <button onclick="selectAnswer(2)" class="w-full text-left bg-white hover:bg-gray-100 border border-gray-200 rounded-md px-4 py-3 transition">
-                            B) چۆنی
-                        </button>
-                        <button onclick="selectAnswer(3)" class="w-full text-left bg-white hover:bg-gray-100 border border-gray-200 rounded-md px-4 py-3 transition">
-                            C) سوپاس
-                        </button>
-                        <button onclick="selectAnswer(4)" class="w-full text-left bg-white hover:bg-gray-100 border border-gray-200 rounded-md px-4 py-3 transition">
-                            D) بەخێربێی
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <button id="quiz-prev" onclick="prevQuizQuestion()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition disabled:opacity-50" disabled>
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button id="quiz-next" onclick="nextQuizQuestion()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button id="quiz-finish" onclick="finishQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition hidden">
-                        Finish <i class="fas fa-check"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quiz Results Modal -->
-    <div id="quiz-results-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
-            <div class="p-6">
-                <div class="text-center mb-6">
-                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trophy text-green-600 text-3xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Quiz Completed!</h3>
-                    <p id="quiz-results-level" class="text-gray-600 mb-1">Level: Beginner</p>
-                    <p class="text-gray-600">Questions: <span id="quiz-results-total">10</span></p>
-                </div>
-                
-                <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-medium">Correct Answers:</span>
-                        <span id="quiz-results-correct" class="font-bold text-green-600">8</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-medium">Wrong Answers:</span>
-                        <span id="quiz-results-wrong" class="font-bold text-red-600">2</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="font-medium">Score:</span>
-                        <span id="quiz-results-score" class="font-bold text-indigo-600">80%</span>
-                    </div>
-                </div>
-                
-                <div class="flex justify-center">
-                    <button onclick="closeQuizResults()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md transition">
-                        Done
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Sample data for words and quizzes
-        const wordsData = {
-            1: [
-                { word: "Hello", meaning: "سڵاو", example: "Hello, how are you today?" },
-                { word: "Goodbye", meaning: "خواتافێ", example: "Goodbye, see you tomorrow!" },
-                { word: "Thank you", meaning: "سوپاس", example: "Thank you for your help." },
-                { word: "Please", meaning: "تکایە", example: "Please sit down." },
-                { word: "Yes", meaning: "بەڵێ", example: "Yes, I understand." },
-                { word: "No", meaning: "نەخێر", example: "No, thank you." },
-                { word: "Sorry", meaning: "ببوورە", example: "Sorry, I'm late." },
-                { word: "Excuse me", meaning: "بماخە", example: "Excuse me, where is the bathroom?" },
-                { word: "Help", meaning: "یارمەتی", example: "I need help." },
-                { word: "Water", meaning: "ئاو", example: "Can I have some water?" }
-            ],
-            2: [
-                { word: "How are you?", meaning: "چۆنی?", example: "Hello, how are you today?" },
-                { word: "What's your name?", meaning: "ناوت چیە?", example: "What's your name? My name is Aland." },
-                { word: "Where are you from?", meaning: "لە کوێی?", example: "Where are you from? I'm from Kurdistan." },
-                { word: "I don't understand", meaning: "لێم ناگات", example: "I don't understand, can you repeat?" },
-                { word: "How much is this?", meaning: "بە چەندە?", example: "How much is this shirt?" },
-                { word: "I like it", meaning: "حەزم لێیە", example: "This food is delicious, I like it." },
-                { word: "I don't like it", meaning: "حەزم لێی نییە", example: "I don't like coffee." },
-                { word: "Can you help me?", meaning: "دەتوانی یارمەتیم بدەیت?", example: "Can you help me with this question?" },
-                { word: "I'm hungry", meaning: "برسیەم", example: "It's lunch time, I'm hungry." },
-                { word: "I'm thirsty", meaning: "تینووم", example: "It's hot, I'm thirsty." }
-            ],
-            3: [
-                { word: "Beautiful", meaning: "جوان", example: "This is a beautiful place." },
-                { word: "Interesting", meaning: "سەرنجڕاکێش", example: "This book is very interesting." },
-                { word: "Difficult", meaning: "قورس", example: "This question is difficult." },
-                { word: "Easy", meaning: "ئاسان", example: "This exercise is easy." },
-                { word: "Important", meaning: "گرنگ", example: "This is an important meeting." },
-                { word: "Different", meaning: "جیاواز", example: "We have different opinions." },
-                { word: "Same", meaning: "هەمان", example: "We have the same book." },
-                { word: "Possible", meaning: "دەکرێت", example: "Is it possible to change the date?" },
-                { word: "Impossible", meaning: "نەکراو", example: "It's impossible to finish today." },
-                { word: "Necessary", meaning: "پێویست", example: "It's necessary to study every day." }
-            ],
-            4: [
-                { word: "Nevertheless", meaning: "سەرەڕای ئەوە", example: "It was raining; nevertheless, we went for a walk." },
-                { word: "Furthermore", meaning: "لەگەڵ ئەوەشدا", example: "The house is beautiful; furthermore, it's in a great location." },
-                { word: "Therefore", meaning: "بۆیە", example: "He didn't study; therefore, he failed the exam." },
-                { word: "However", meaning: "هەرچەندە", example: "I like the idea; however, I think it's too expensive." },
-                { word: "Although", meaning: "هەرچەندە", example: "Although it was late, we decided to go out." },
-                { word: "Meanwhile", meaning: "لەکاتێکدا", example: "I'll cook dinner; meanwhile, you can set the table." },
-                { word: "Consequently", meaning: "لە ئەنجامدا", example: "He didn't study; consequently, he failed." },
-                { word: "Similarly", meaning: "بەهەمان شێوە", example: "She was late; similarly, her brother arrived after the meeting started." },
-                { word: "Otherwise", meaning: "وەک ئەوەنە", example: "Hurry up; otherwise, we'll be late." },
-                { word: "Moreover", meaning: "لەوەش زیاتر", example: "The price is reasonable; moreover, the quality is excellent." }
-            ],
-            5: [
-                { word: "Ambiguous", meaning: "دووپاتە", example: "The instructions were ambiguous, so I didn't understand." },
-                { word: "Comprehensive", meaning: "پوختە", example: "This is a comprehensive guide to English grammar." },
-                { word: "Conventional", meaning: "ئاسایی", example: "This is the conventional method for solving this problem." },
-                { word: "Empirical", meaning: "ئەزموونی", example: "The theory needs empirical evidence to support it." },
-                { word: "Hypothesis", meaning: "گریمانە", example: "Scientists tested their hypothesis with experiments." },
-                { word: "Innovative", meaning: "نوێگەرایی", example: "This is an innovative approach to teaching languages." },
-                { word: "Methodology", meaning: "شێواز", example: "The research methodology was clearly explained." },
-                { word: "Paradigm", meaning: "نمونە", example: "This discovery caused a paradigm shift in physics." },
-                { word: "Phenomenon", meaning: "دیاردە", example: "Lightning is a natural phenomenon." },
-                { word: "Theoretical", meaning: "بیردۆزی", example: "This is still at the theoretical stage." }
-            ]
-        };
-
-        const quizData = {
-            1: [
-                {
-                    question: "What is the meaning of 'Hello' in Kurdish?",
-                    options: ["سڵاو", "چۆنی", "سوپاس", "بەخێربێی"],
-                    answer: 1
-                },
-                {
-                    question: "How do you say 'Thank you' in Kurdish?",
-                    options: ["ببوورە", "سوپاس", "تکایە", "خواتافێ"],
-                    answer: 2
-                },
-                {
-                    question: "What does 'Yes' mean in Kurdish?",
-                    options: ["نەخێر", "بەڵێ", "تکایە", "یارمەتی"],
-                    answer: 2
-                },
-                {
-                    question: "What is the English word for 'ئاو'?",
-                    options: ["Food", "Water", "Drink", "Juice"],
-                    answer: 2
-                },
-                {
-                    question: "What does 'Goodbye' mean in Kurdish?",
-                    options: ["سڵاو", "خواتافێ", "بەخێربێی", "ببوورە"],
-                    answer: 2
-                }
-            ],
-            2: [
-                {
-                    question: "How do you ask 'What's your name?' in Kurdish?",
-                    options: ["چۆنی?", "لە کوێی?", "ناوت چیە?", "بە چەندە?"],
-                    answer: 3
-                },
-                {
-                    question: "What is the meaning of 'I don't understand' in Kurdish?",
-                    options: ["لێم ناگات", "حەزم لێی نییە", "برسیەم", "تینووم"],
-                    answer: 1
-                },
-                {
-                    question: "How do you say 'I like it' in Kurdish?",
-                    options: ["حەزم لێی نییە", "حەزم لێیە", "لێم ناگات", "بە چەندە?"],
-                    answer: 2
-                },
-                {
-                    question: "What does 'Where are you from?' mean in Kurdish?",
-                    options: ["ناوت چیە?", "لە کوێی?", "چۆنی?", "بە چەندە?"],
-                    answer: 2
-                },
-                {
-                    question: "How do you say 'Can you help me?' in Kurdish?",
-                    options: ["دەتوانی یارمەتیم بدەیت?", "چۆنی?", "لە کوێی?", "بە چەندە?"],
-                    answer: 1
-                }
-            ],
-            3: [
-                {
-                    question: "What is the meaning of 'Beautiful' in Kurdish?",
-                    options: ["قورس", "ئاسان", "جوان", "گرنگ"],
-                    answer: 3
-                },
-                {
-                    question: "How do you say 'Difficult' in Kurdish?",
-                    options: ["ئاسان", "قورس", "جوان", "سەرنجڕاکێش"],
-                    answer: 2
-                },
-                {
-                    question: "What does 'Important' mean in Kurdish?",
-                    options: ["گرنگ", "جیاواز", "هەمان", "دەکرێت"],
-                    answer: 1
-                },
-                {
-                    question: "What is the English word for 'ئاسان'?",
-                    options: ["Difficult", "Easy", "Important", "Different"],
-                    answer: 2
-                },
-                {
-                    question: "What does 'Possible' mean in Kurdish?",
-                    options: ["نەکراو", "دەکرێت", "پێویست", "گرنگ"],
-                    answer: 2
-                }
-            ],
-            4: [
-                {
-                    question: "What is the meaning of 'Nevertheless' in Kurdish?",
-                    options: ["لەگەڵ ئەوەشدا", "بۆیە", "سەرەڕای ئەوە", "هەرچەندە"],
-                    answer: 3
-                },
-                {
-                    question: "How do you say 'Therefore' in Kurdish?",
-                    options: ["بۆیە", "هەرچەندە", "لەکاتێکدا", "لە ئەنجامدا"],
-                    answer: 1
-                },
-                {
-                    question: "What does 'However' mean in Kurdish?",
-                    options: ["هەرچەندە", "بۆیە", "لەگەڵ ئەوەشدا", "سەرەڕای ئەوە"],
-                    answer: 1
-                },
-                {
-                    question: "What is the English word for 'لەکاتێکدا'?",
-                    options: ["Therefore", "Meanwhile", "However", "Although"],
-                    answer: 2
-                },
-                {
-                    question: "What does 'Consequently' mean in Kurdish?",
-                    options: ["لە ئەنجامدا", "بەهەمان شێوە", "وەک ئەوەنە", "لەوەش زیاتر"],
-                    answer: 1
-                }
-            ],
-            5: [
-                {
-                    question: "What is the meaning of 'Ambiguous' in Kurdish?",
-                    options: ["پوختە", "دووپاتە", "ئاسایی", "ئەزموونی"],
-                    answer: 2
-                },
-                {
-                    question: "How do you say 'Comprehensive' in Kurdish?",
-                    options: ["پوختە", "دووپاتە", "نوێگەرایی", "شێواز"],
-                    answer: 1
-                },
-                {
-                    question: "What does 'Empirical' mean in Kurdish?",
-                    options: ["ئەزموونی", "گریمانە", "نمونە", "دیاردە"],
-                    answer: 1
-                },
-                {
-                    question: "What is the English word for 'گریمانە'?",
-                    options: ["Hypothesis", "Innovative", "Methodology", "Paradigm"],
-                    answer: 1
-                },
-                {
-                    question: "What does 'Theoretical' mean in Kurdish?",
-                    options: ["بیردۆزی", "ئەزموونی", "نوێگەرایی", "دیاردە"],
-                    answer: 1
-                }
-            ],
-            mixed: [
-                {
-                    question: "What is the meaning of 'Hello' in Kurdish?",
-                    options: ["سڵاو", "چۆنی", "سوپاس", "بەخێربێی"],
-                    answer: 1,
-                    level: 1
-                },
-                {
-                    question: "How do you ask 'What's your name?' in Kurdish?",
-                    options: ["چۆنی?", "لە کوێی?", "ناوت چیە?", "بە چەندە?"],
-                    answer: 3,
-                    level: 2
-                },
-                {
-                    question: "What is the meaning of 'Beautiful' in Kurdish?",
-                    options: ["قورس", "ئاسان", "جوان", "گرنگ"],
-                    answer: 3,
-                    level: 3
-                },
-                {
-                    question: "What is the meaning of 'Nevertheless' in Kurdish?",
-                    options: ["لەگەڵ ئەوەشدا", "بۆیە", "سەرەڕای ئەوە", "هەرچەندە"],
-                    answer: 3,
-                    level: 4
-                },
-                {
-                    question: "What is the meaning of 'Ambiguous' in Kurdish?",
-                    options: ["پوختە", "دووپاتە", "ئاسایی", "ئەزموونی"],
-                    answer: 2,
-                    level: 5
-                }
-            ]
-        };
-
-        // App state
-        let currentLevel = 1;
-        let currentWordIndex = 0;
-        let wordCount = 10;
-        let words = [];
-        
-        let quizLevel = 1;
-        let quizQuestionCount = 10;
-        let quizQuestions = [];
-        let currentQuizQuestionIndex = 0;
-        let userAnswers = [];
-        let quizStarted = false;
-
-        // DOM elements
-        const loadingElement = document.getElementById('loading');
-        const mainContentElement = document.getElementById('main-content');
-        const visitorCountElement = document.getElementById('visitor-count');
-        const darkModeButton = document.getElementById('dark-mode');
-        const lightModeButton = document.getElementById('light-mode');
-        
-        const levelModal = document.getElementById('level-modal');
-        const levelTitleElement = document.getElementById('level-title');
-        const currentWordElement = document.getElementById('current-word');
-        const wordMeaningElement = document.getElementById('word-meaning');
-        const wordExampleElement = document.getElementById('word-example');
-        const wordProgressElement = document.getElementById('word-progress');
-        const prevWordButton = document.getElementById('prev-word');
-        const nextWordButton = document.getElementById('next-word');
-        const wordCountSelect = document.getElementById('word-count');
-        
-        const quizModal = document.getElementById('quiz-modal');
-        const quizQuestionModal = document.getElementById('quiz-question-modal');
-        const quizLevelTitleElement = document.getElementById('quiz-level-title');
-        const quizQuestionElement = document.getElementById('quiz-question');
-        const quizProgressElement = document.getElementById('quiz-progress');
-        const quizPrevButton = document.getElementById('quiz-prev');
-        const quizNextButton = document.getElementById('quiz-next');
-        const quizFinishButton = document.getElementById('quiz-finish');
-        const quizQuestionCountSelect = document.getElementById('quiz-question-count');
-        
-        const quizResultsModal = document.getElementById('quiz-results-modal');
-        const quizResultsLevelElement = document.getElementById('quiz-results-level');
-        const quizResultsTotalElement = document.getElementById('quiz-results-total');
-        const quizResultsCorrectElement = document.getElementById('quiz-results-correct');
-        const quizResultsWrongElement = document.getElementById('quiz-results-wrong');
-        const quizResultsScoreElement = document.getElementById('quiz-results-score');
-
-        // Initialize the app
-        function init() {
-            // Simulate loading for 3 seconds
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set theme based on localStorage or prefer-color-scheme
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            // Show welcome animation for 3 seconds, then show main content
             setTimeout(() => {
-                loadingElement.classList.add('opacity-0');
-                setTimeout(() => {
-                    loadingElement.classList.add('hidden');
-                    mainContentElement.classList.remove('hidden');
-                    mainContentElement.classList.add('count-up');
-                    
-                    // Initialize visitor count
-                    let visitorCount = localStorage.getItem('visitorCount') || 0;
-                    visitorCount = parseInt(visitorCount) + 1;
-                    localStorage.setItem('visitorCount', visitorCount);
-                    
-                    // Animate the count up
-                    let count = 0;
-                    const interval = setInterval(() => {
-                        visitorCountElement.textContent = count;
-                        count++;
-                        if (count > visitorCount) {
-                            clearInterval(interval);
-                        }
-                    }, 50);
-                    
-                }, 500);
+                document.getElementById('welcome').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                
+                // Add slide-in animation to sections
+                const sections = document.querySelectorAll('section');
+                sections.forEach((section, index) => {
+                    setTimeout(() => {
+                        section.classList.add('slide-in');
+                    }, index * 100);
+                });
             }, 3000);
             
-            // Set up dark/light mode toggle
-            darkModeButton.addEventListener('click', () => {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('darkMode', 'enabled');
+            // Update visitor count
+            let visitorCount = localStorage.getItem('visitorCount') || 0;
+            visitorCount = parseInt(visitorCount) + 1;
+            localStorage.setItem('visitorCount', visitorCount);
+            document.getElementById('visitor-count').textContent = visitorCount;
+            document.getElementById('mobile-visitor-count').textContent = visitorCount;
+            
+            // Theme toggle functionality
+            const themeToggleBtns = document.querySelectorAll('#theme-toggle, #mobile-theme-toggle');
+            themeToggleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Toggle between light and dark mode
+                    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && document.documentElement.classList.contains('dark'))) {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('color-theme', 'light');
+                    } else {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('color-theme', 'dark');
+                    }
+                });
             });
             
-            lightModeButton.addEventListener('click', () => {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('darkMode', 'disabled');
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
             });
             
-            // Check for saved dark mode preference
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.documentElement.classList.add('dark');
-            }
-            
-            // Initialize word count select
-            wordCountSelect.addEventListener('change', (e) => {
-                wordCount = parseInt(e.target.value);
-                loadWords();
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        
+                        // Close mobile menu if open
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
             });
             
-            // Initialize quiz question count select
-            quizQuestionCountSelect.addEventListener('change', (e) => {
-                quizQuestionCount = parseInt(e.target.value);
-            });
-        }
-
-        // Level functions
-        function openLevel(level) {
-            currentLevel = level;
-            wordCount = parseInt(wordCountSelect.value);
-            loadWords();
-            
-            levelTitleElement.textContent = `Level ${level}: ${getLevelName(level)}`;
-            levelModal.classList.remove('hidden');
-        }
-
-        function closeLevelModal() {
-            levelModal.classList.add('hidden');
-            currentWordIndex = 0;
-        }
-
-        function loadWords() {
-            words = wordsData[currentLevel].slice(0, wordCount);
-            currentWordIndex = 0;
-            updateWordDisplay();
-        }
-
-        function updateWordDisplay() {
-            if (words.length === 0) return;
-            
-            const currentWord = words[currentWordIndex];
-            currentWordElement.textContent = currentWord.word;
-            wordMeaningElement.textContent = currentWord.meaning;
-            wordExampleElement.textContent = currentWord.example;
-            wordProgressElement.textContent = `${currentWordIndex + 1}/${words.length}`;
-            
-            prevWordButton.disabled = currentWordIndex === 0;
-            nextWordButton.disabled = currentWordIndex === words.length - 1;
-        }
-
-        function prevWord() {
-            if (currentWordIndex > 0) {
-                currentWordIndex--;
-                updateWordDisplay();
-            }
-        }
-
-        function nextWord() {
-            if (currentWordIndex < words.length - 1) {
-                currentWordIndex++;
-                updateWordDisplay();
-            }
-        }
-
-        function speakWord() {
-            const currentWord = words[currentWordIndex].word;
-            const utterance = new SpeechSynthesisUtterance(currentWord);
-            utterance.lang = 'en-US';
-            speechSynthesis.speak(utterance);
-        }
-
-        function getLevelName(level) {
-            const names = {
-                1: 'Basic Words',
-                2: 'Common Phrases',
-                3: 'Grammar Basics',
-                4: 'Complex Sentences',
-                5: 'Academic English'
+            // Vocabulary data for all levels
+            const vocabulary = {
+                a1: {
+                    name: "A1 - Beginner",
+                    description: "Basic words and phrases for everyday situations",
+                    words: [
+                        { word: "Apple", translation: "سیو", example: "I eat an apple every day." },
+                        { word: "Book", translation: "کتێب", example: "This is my favorite book." },
+                        { word: "Chair", translation: "کورسی", example: "Please sit on the chair." },
+                        { word: "Dog", translation: "سگ", example: "The dog is very friendly." },
+                        { word: "Eat", translation: "خواردن", example: "We eat dinner at 7 PM." },
+                        { word: "Friend", translation: "هاوڕێ", example: "My friend is coming to visit." },
+                        { word: "Good", translation: "باش", example: "She is a good student." },
+                        { word: "House", translation: "خانوو", example: "Our house has three bedrooms." },
+                        { word: "Jump", translation: "بازدان", example: "The children love to jump." },
+                        { word: "Key", translation: "کلیل", example: "I lost my house key." }
+                    ]
+                },
+                a2: {
+                    name: "A2 - Elementary",
+                    description: "Common words for simple communication",
+                    words: [
+                        { word: "Beautiful", translation: "جوان", example: "The sunset was beautiful." },
+                        { word: "City", translation: "شار", example: "I live in a big city." },
+                        { word: "Dangerous", translation: "مەترسیدار", example: "That road is dangerous at night." },
+                        { word: "Exciting", translation: "سەرنجڕاکێش", example: "The movie was very exciting." },
+                        { word: "Future", translation: "داهاتوو", example: "I think about my future often." },
+                        { word: "Garden", translation: "باخچە", example: "We grow vegetables in our garden." },
+                        { word: "Holiday", translation: "پشوو", example: "We're going on holiday next month." },
+                        { word: "Important", translation: "گرنگ", example: "This is an important meeting." },
+                        { word: "Journey", translation: "گەشت", example: "The journey took three hours." },
+                        { word: "Kind", translation: "چاکەکار", example: "She is a very kind person." }
+                    ]
+                },
+                b1: {
+                    name: "B1 - Intermediate",
+                    description: "Vocabulary for expressing opinions and experiences",
+                    words: [
+                        { word: "Ambitious", translation: "ئارەزوومەند", example: "He's ambitious and wants to start his own business." },
+                        { word: "Benefit", translation: "سوود", example: "Regular exercise has many health benefits." },
+                        { word: "Challenge", translation: "بەرەنگاربوونەوە", example: "Learning a new language is a challenge." },
+                        { word: "Decision", translation: "بڕیار", example: "Making important decisions can be difficult." },
+                        { word: "Effective", translation: "کاریگەر", example: "This method is very effective for studying." },
+                        { word: "Familiar", translation: "ناسراو", example: "That song sounds familiar to me." },
+                        { word: "Generation", translation: "نەوە", example: "Different generations have different perspectives." },
+                        { word: "Honest", translation: "ڕاستگۆ", example: "Always be honest with your friends." },
+                        { word: "Influence", translation: "کاریگەری", example: "Parents have a big influence on their children." },
+                        { word: "Justice", translation: "دادپەروەری", example: "Everyone deserves equal justice." }
+                    ]
+                },
+                b2: {
+                    name: "B2 - Upper-Intermediate",
+                    description: "Vocabulary for complex texts and discussions",
+                    words: [
+                        { word: "Accomplish", translation: "جێبەجێکردن", example: "She accomplished all her goals this year." },
+                        { word: "Boundary", translation: "سنور", example: "It's important to set boundaries in relationships." },
+                        { word: "Controversial", translation: "جێی مشتومڕ", example: "This is a controversial topic in politics." },
+                        { word: "Dedicate", translation: "تەرخانکردن", example: "He dedicated his life to helping others." },
+                        { word: "Efficient", translation: "کارامە", example: "This new system is more efficient than the old one." },
+                        { word: "Fundamental", translation: "بنەڕەتی", example: "Respect is fundamental in any relationship." },
+                        { word: "Hypothesis", translation: "گریمانە", example: "Scientists tested their hypothesis with experiments." },
+                        { word: "Innovative", translation: "نوێگەری", example: "The company is known for its innovative products." },
+                        { word: "Justify", translation: "ڕێگەگرتن", example: "Can you justify your decision?" },
+                        { word: "Knowledgeable", translation: "زیرەک", example: "Our teacher is very knowledgeable about history." }
+                    ]
+                },
+                c1: {
+                    name: "C1 - Advanced",
+                    description: "Vocabulary for academic and professional contexts",
+                    words: [
+                        { word: "Articulate", translation: "ڕوون", example: "She's very articulate when explaining complex ideas." },
+                        { word: "Bureaucracy", translation: "بوروکراسی", example: "Dealing with bureaucracy can be frustrating." },
+                        { word: "Coherent", translation: "پێکەوەگرێدراو", example: "His argument was clear and coherent." },
+                        { word: "Deteriorate", translation: "خراپبوون", example: "The political situation began to deteriorate." },
+                        { word: "Elaborate", translation: "ورد", example: "He gave an elaborate explanation of the process." },
+                        { word: "Fluctuate", translation: "گۆڕان", example: "Prices tend to fluctuate during economic crises." },
+                        { word: "Hierarchy", translation: "پلەبەندی", example: "The company has a strict hierarchy." },
+                        { word: "Impartial", translation: "بێلایەن", example: "Judges must remain impartial during trials." },
+                        { word: "Juxtapose", translation: "بەراوردکردن", example: "The exhibition juxtaposes modern and classical art." },
+                        { word: "Kaleidoscope", translation: "فرەڕەنگ", example: "The city is a kaleidoscope of cultures." }
+                    ]
+                },
+                c2: {
+                    name: "C2 - Mastery",
+                    description: "Precise vocabulary for nuanced expression",
+                    words: [
+                        { word: "Aberration", translation: "نەهاڵەیی", example: "The unusual test result was just an aberration." },
+                        { word: "Bombastic", translation: "گەورەنوس", example: "His bombastic speech didn't impress the audience." },
+                        { word: "Cacophony", translation: "دەنگێکی ناخۆش", example: "The cacophony of car horns was unbearable." },
+                        { word: "Debilitate", translation: "بێهێزکردن", example: "The illness can debilitate patients for months." },
+                        { word: "Ebullient", translation: "پەرۆش", example: "Her ebullient personality lights up the room." },
+                        { word: "Fastidious", translation: "وردبین", example: "He's fastidious about keeping his workspace tidy." },
+                        { word: "Garrulous", translation: "زۆر قسە", example: "The garrulous old man told stories for hours." },
+                        { word: "Harangue", translation: "قسەی درێژ", example: "The manager delivered a long harangue about punctuality." },
+                        { word: "Iconoclast", translation: "پەرستگاشکێن", example: "The artist was an iconoclast who challenged traditions." },
+                        { word: "Juggernaut", translation: "هێزی بێهێڵ", example: "The company became a juggernaut in the tech industry." }
+                    ]
+                }
             };
-            return names[level] || '';
-        }
-
-        // Quiz functions
-        function openQuizModal() {
-            quizModal.classList.remove('hidden');
-        }
-
-        function closeQuizModal() {
-            quizModal.classList.add('hidden');
-        }
-
-        function selectQuizLevel(level) {
-            quizLevel = level;
-        }
-
-        function startQuiz() {
-            closeQuizModal();
             
-            // Prepare quiz questions
-            if (quizLevel === 'mixed') {
-                quizQuestions = quizData.mixed;
-            } else {
-                quizQuestions = quizData[quizLevel];
-            }
+            // Flashcard functionality
+            let currentLevel = null;
+            let currentCardIndex = 0;
+            let cards = [];
             
-            // Limit to selected number of questions
-            if (quizQuestions.length > quizQuestionCount) {
-                // Shuffle and take first n questions
-                quizQuestions = shuffleArray(quizQuestions).slice(0, quizQuestionCount);
-            }
+            // Level buttons
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const level = this.getAttribute('data-level');
+                    startLevel(level);
+                });
+            });
             
-            currentQuizQuestionIndex = 0;
-            userAnswers = Array(quizQuestions.length).fill(null);
-            quizStarted = true;
-            
-            showQuizQuestion();
-        }
-
-        function showQuizQuestion() {
-            if (!quizQuestions.length) return;
-            
-            const question = quizQuestions[currentQuizQuestionIndex];
-            
-            quizLevelTitleElement.textContent = `Quiz: ${quizLevel === 'mixed' ? `Level ${question.level}` : `Level ${quizLevel}`}`;
-            quizQuestionElement.textContent = question.question;
-            quizProgressElement.textContent = `${currentQuizQuestionIndex + 1}/${quizQuestions.length}`;
-            
-            // Update answer buttons
-            const answerButtons = document.querySelectorAll('#quiz-question-modal button:not([id])');
-            answerButtons.forEach((button, index) => {
-                button.textContent = `${String.fromCharCode(65 + index)}) ${question.options[index]}`;
+            // Start a level
+            function startLevel(level) {
+                currentLevel = level;
+                currentCardIndex = 0;
+                cards = vocabulary[level].words;
                 
-                // Highlight selected answer if exists
-                if (userAnswers[currentQuizQuestionIndex] === index + 1) {
-                    button.classList.add('bg-indigo-100', 'border-indigo-300');
+                // Update UI
+                document.getElementById('current-level').textContent = vocabulary[level].name;
+                document.getElementById('level-description').textContent = vocabulary[level].description;
+                
+                // Hide levels table, show flashcard container
+                document.querySelector('#levels table').style.display = 'none';
+                document.getElementById('flashcard-container').style.display = 'block';
+                
+                // Load first card
+                loadCard();
+            }
+            
+            // Load current card
+            function loadCard() {
+                const card = cards[currentCardIndex];
+                document.getElementById('card-word').textContent = card.word;
+                document.getElementById('card-translation').textContent = card.translation;
+                document.getElementById('card-example').textContent = card.example;
+                
+                // Update progress
+                document.getElementById('card-counter').textContent = `${currentCardIndex + 1}/${cards.length}`;
+                const progressPercent = ((currentCardIndex + 1) / cards.length) * 100;
+                document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+                
+                // Reset card to front
+                document.querySelector('.card').classList.remove('flipped');
+                
+                // Set up audio buttons
+                document.querySelectorAll('.audio-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        speak(card.word);
+                    };
+                });
+            }
+            
+            // Text to speech
+            function speak(text) {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    window.speechSynthesis.speak(utterance);
                 } else {
-                    button.classList.remove('bg-indigo-100', 'border-indigo-300');
+                    alert('Text-to-speech is not supported in your browser');
                 }
-            });
-            
-            // Update navigation buttons
-            quizPrevButton.disabled = currentQuizQuestionIndex === 0;
-            
-            if (currentQuizQuestionIndex === quizQuestions.length - 1) {
-                quizNextButton.classList.add('hidden');
-                quizFinishButton.classList.remove('hidden');
-            } else {
-                quizNextButton.classList.remove('hidden');
-                quizFinishButton.classList.add('hidden');
             }
             
-            quizQuestionModal.classList.remove('hidden');
-        }
-
-        function selectAnswer(answerIndex) {
-            userAnswers[currentQuizQuestionIndex] = answerIndex;
-            
-            // Highlight selected answer
-            const answerButtons = document.querySelectorAll('#quiz-question-modal button:not([id])');
-            answerButtons.forEach((button, index) => {
-                if (answerIndex === index + 1) {
-                    button.classList.add('bg-indigo-100', 'border-indigo-300');
+            // Next card button
+            document.getElementById('next-card').addEventListener('click', function() {
+                if (currentCardIndex < cards.length - 1) {
+                    currentCardIndex++;
+                    loadCard();
                 } else {
-                    button.classList.remove('bg-indigo-100', 'border-indigo-300');
-                }
-            });
-        }
-
-        function prevQuizQuestion() {
-            if (currentQuizQuestionIndex > 0) {
-                currentQuizQuestionIndex--;
-                showQuizQuestion();
-            }
-        }
-
-        function nextQuizQuestion() {
-            if (currentQuizQuestionIndex < quizQuestions.length - 1) {
-                currentQuizQuestionIndex++;
-                showQuizQuestion();
-            }
-        }
-
-        function finishQuiz() {
-            // Calculate results
-            let correct = 0;
-            quizQuestions.forEach((question, index) => {
-                if (userAnswers[index] === question.answer) {
-                    correct++;
+                    // End of cards
+                    alert('You have finished all cards in this level!');
                 }
             });
             
-            const wrong = quizQuestions.length - correct;
-            const score = Math.round((correct / quizQuestions.length) * 100);
+            // Previous card button
+            document.getElementById('prev-card').addEventListener('click', function() {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                    loadCard();
+                }
+            });
             
-            // Display results
-            quizResultsLevelElement.textContent = quizLevel === 'mixed' ? 'Mixed Levels' : `Level ${quizLevel}`;
-            quizResultsTotalElement.textContent = quizQuestions.length;
-            quizResultsCorrectElement.textContent = correct;
-            quizResultsWrongElement.textContent = wrong;
-            quizResultsScoreElement.textContent = `${score}%`;
+            // Flip card on click
+            document.querySelector('.card').addEventListener('click', function() {
+                this.classList.toggle('flipped');
+            });
             
-            quizQuestionModal.classList.add('hidden');
-            quizResultsModal.classList.remove('hidden');
-        }
-
-        function closeQuizResults() {
-            quizResultsModal.classList.add('hidden');
-            quizStarted = false;
-        }
-
-        // Utility functions
-        function shuffleArray(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            // Back to levels button
+            document.getElementById('back-to-levels').addEventListener('click', function() {
+                document.querySelector('#levels table').style.display = 'table';
+                document.getElementById('flashcard-container').style.display = 'none';
+            });
+            
+            // Quiz functionality
+            let quizQuestions = [];
+            let currentQuestionIndex = 0;
+            let correctAnswers = 0;
+            let quizStartTime = 0;
+            let quizTimer = null;
+            
+            // Take quiz button
+            document.getElementById('take-quiz').addEventListener('click', function() {
+                // Show quiz modal
+                document.getElementById('quiz-modal').classList.remove('hidden');
+            });
+            
+            // Close quiz modal
+            document.getElementById('close-quiz-modal').addEventListener('click', function() {
+                document.getElementById('quiz-modal').classList.add('hidden');
+            });
+            
+            // Start quiz button
+            document.getElementById('start-quiz').addEventListener('click', function() {
+                const level = document.getElementById('quiz-level').value;
+                const count = parseInt(document.getElementById('quiz-count').value);
+                
+                // Generate quiz questions
+                quizQuestions = generateQuizQuestions(level, count);
+                currentQuestionIndex = 0;
+                correctAnswers = 0;
+                
+                // Close modal
+                document.getElementById('quiz-modal').classList.add('hidden');
+                
+                // Hide flashcard container, show quiz container
+                document.getElementById('flashcard-container').style.display = 'none';
+                document.getElementById('quiz-container').style.display = 'block';
+                
+                // Start timer
+                quizStartTime = Date.now();
+                updateQuizTimer();
+                quizTimer = setInterval(updateQuizTimer, 1000);
+                
+                // Load first question
+                loadQuestion();
+            });
+            
+            // Generate quiz questions
+            function generateQuizQuestions(level, count) {
+                const allWords = vocabulary[level].words;
+                const questions = [];
+                
+                // Shuffle words and take the requested count
+                const shuffled = [...allWords].sort(() => 0.5 - Math.random()).slice(0, count);
+                
+                shuffled.forEach(word => {
+                    // Get 3 random wrong answers
+                    const wrongAnswers = [...allWords]
+                        .filter(w => w.word !== word.word)
+                        .sort(() => 0.5 - Math.random())
+                        .slice(0, 3)
+                        .map(w => w.translation);
+                    
+                    // Combine with correct answer and shuffle
+                    const options = [word.translation, ...wrongAnswers]
+                        .sort(() => 0.5 - Math.random());
+                    
+                    questions.push({
+                        word: word.word,
+                        correctAnswer: word.translation,
+                        options: options,
+                        example: word.example
+                    });
+                });
+                
+                return questions;
             }
-            return newArray;
-        }
-
-        // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', init);
+            
+            // Load current question
+            function loadQuestion() {
+                const question = quizQuestions[currentQuestionIndex];
+                
+                // Update UI
+                document.getElementById('quiz-title').textContent = `Quiz: ${vocabulary[currentLevel].name}`;
+                document.getElementById('quiz-progress').textContent = `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+                document.getElementById('quiz-question').textContent = `What is the meaning of "${question.word}"?`;
+                
+                // Update progress bar
+                const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
+                document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
+                
+                // Clear previous options
+                const optionsContainer = document.getElementById('quiz-options');
+                optionsContainer.innerHTML = '';
+                
+                // Add new options
+                question.options.forEach((option, index) => {
+                    const optionElement = document.createElement('button');
+                    optionElement.className = 'quiz-option p-4 text-left rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors';
+                    optionElement.textContent = option;
+                    optionElement.dataset.answer = option === question.correctAnswer ? 'correct' : 'wrong';
+                    optionElement.addEventListener('click', selectAnswer);
+                    optionsContainer.appendChild(optionElement);
+                });
+            }
+            
+            // Select answer
+            function selectAnswer(e) {
+                // Disable all options
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.disabled = true;
+                    opt.classList.remove('hover:bg-gray-100', 'dark:hover:bg-gray-700');
+                    
+                    // Highlight correct answer
+                    if (opt.dataset.answer === 'correct') {
+                        opt.classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-300', 'dark:border-green-700');
+                    }
+                    
+                    // Highlight wrong answer if selected
+                    if (opt === e.target && opt.dataset.answer === 'wrong') {
+                        opt.classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-300', 'dark:border-red-700');
+                    }
+                });
+                
+                // Count correct answers
+                if (e.target.dataset.answer === 'correct') {
+                    correctAnswers++;
+                }
+                
+                // Enable submit button
+                document.getElementById('submit-quiz').disabled = false;
+            }
+            
+            // Submit answer and go to next question
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                this.disabled = true;
+                
+                if (currentQuestionIndex < quizQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                } else {
+                    // Quiz finished
+                    finishQuiz();
+                }
+            });
+            
+            // Quit quiz button
+            document.getElementById('quit-quiz').addEventListener('click', function() {
+                if (confirm('Are you sure you want to quit the quiz? Your progress will be lost.')) {
+                    clearInterval(quizTimer);
+                    document.getElementById('quiz-container').style.display = 'none';
+                    document.getElementById('flashcard-container').style.display = 'block';
+                }
+            });
+            
+            // Update quiz timer
+            function updateQuizTimer() {
+                const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+                const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+                const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('quiz-timer').textContent = `${minutes}:${seconds}`;
+            }
+            
+            // Finish quiz and show results
+            function finishQuiz() {
+                clearInterval(quizTimer);
+                
+                // Calculate score
+                const score = Math.round((correctAnswers / quizQuestions.length) * 100);
+                const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+                const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+                const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+                
+                // Update results UI
+                document.getElementById('quiz-score').textContent = `${score}%`;
+                document.getElementById('quiz-level-result').textContent = vocabulary[currentLevel].name;
+                document.getElementById('quiz-time-result').textContent = `${minutes}:${seconds}`;
+                document.getElementById('correct-answers').textContent = correctAnswers;
+                document.getElementById('wrong-answers').textContent = quizQuestions.length - correctAnswers;
+                document.getElementById('total-questions').textContent = quizQuestions.length;
+                
+                // Set progress bar
+                document.getElementById('results-progress-bar').style.width = `${score}%`;
+                
+                // Set result message
+                const resultMessage = document.getElementById('quiz-result-message');
+                if (score >= 90) {
+                    resultMessage.textContent = "Excellent! You have mastered this level.";
+                } else if (score >= 70) {
+                    resultMessage.textContent = "Good job! You're doing well with this level.";
+                } else if (score >= 50) {
+                    resultMessage.textContent = "Not bad! Keep practicing to improve.";
+                } else {
+                    resultMessage.textContent = "Keep trying! Review the words and try again.";
+                }
+                
+                // Generate feedback
+                const feedbackContainer = document.getElementById('quiz-feedback');
+                feedbackContainer.innerHTML = '<h4 class="font-medium text-gray-800 dark:text-white mb-2">Words to review:</h4>';
+                
+                // Add words with wrong answers
+                quizQuestions.forEach((q, index) => {
+                    const userAnswer = document.querySelector(`#quiz-options button[data-answer="correct"]`);
+                    if (!userAnswer || userAnswer.dataset.answer !== 'correct') {
+                        const feedbackItem = document.createElement('div');
+                        feedbackItem.className = 'mb-2';
+                        feedbackItem.innerHTML = `<span class="font-medium">${q.word}</span>: ${q.correctAnswer} (e.g., "${q.example}")`;
+                        feedbackContainer.appendChild(feedbackItem);
+                    }
+                });
+                
+                // Hide quiz container, show results
+                document.getElementById('quiz-container').style.display = 'none';
+                document.getElementById('quiz-results').style.display = 'block';
+            }
+            
+            // Review quiz button
+            document.getElementById('review-quiz').addEventListener('click', function() {
+                // Reset quiz
+                currentQuestionIndex = 0;
+                correctAnswers = 0;
+                quizStartTime = Date.now();
+                
+                // Hide results, show quiz
+                document.getElementById('quiz-results').style.display = 'none';
+                document.getElementById('quiz-container').style.display = 'block';
+                
+                // Start timer
+                updateQuizTimer();
+                quizTimer = setInterval(updateQuizTimer, 1000);
+                
+                // Load first question
+                loadQuestion();
+            });
+            
+            // New quiz button
+            document.getElementById('new-quiz').addEventListener('click', function() {
+                // Show quiz modal
+                document.getElementById('quiz-results').style.display = 'none';
+                document.getElementById('quiz-modal').classList.remove('hidden');
+            });
+            
+            // Back to home button
+            document.getElementById('back-to-home').addEventListener('click', function() {
+                document.getElementById('quiz-results').style.display = 'none';
+                document.getElementById('flashcard-container').style.display = 'none';
+                document.querySelector('#levels table').style.display = 'table';
+                
+                // Scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
     </script>
 </body>
 </html>
