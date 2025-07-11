@@ -3,639 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monopoly Here & Now Edition</title>
+    <title>Site Portal - View Embedded Websites</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .property-card {
+        .site-card {
             transition: all 0.3s ease;
-            transform-style: preserve-3d;
+            background-size: cover;
+            background-position: center;
         }
-        .property-card:hover {
-            transform: translateY(-5px) rotateX(5deg);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        .site-card:hover {
+            transform: translateY(-5px);
         }
-        .board-cell {
+        .iframe-container {
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            overflow: hidden;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
         }
-        .corner-cell {
-            width: 12%;
-            height: 12%;
+        .responsive-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        .side-cell {
-            width: 7.6%;
-            height: 12%;
+        .modal {
+            transition: opacity 0.3s ease;
         }
-        .rotate-90 {
-            transform: rotate(90deg);
-        }
-        .rotate-180 {
-            transform: rotate(180deg);
-        }
-        .rotate-270 {
-            transform: rotate(270deg);
-        }
-        .dice {
-            animation: shake 0.5s;
-        }
-        @keyframes shake {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(5deg); }
-            50% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-            100% { transform: rotate(0deg); }
-        }
-        .player-token {
-            transition: all 0.3s ease;
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Game Header -->
-        <div class="flex justify-between items-center mb-6">
-            <div class="flex items-center">
-                <i class="fas fa-crown text-yellow-500 text-3xl mr-2"></i>
-                <h1 class="text-3xl font-bold text-blue-800">MONOPOLY</h1>
-                <span class="ml-2 text-sm bg-blue-600 text-white px-2 py-1 rounded">Here & Now Edition</span>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-indigo-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-window-restore text-2xl"></i>
+                <h1 class="text-xl font-bold">Site Portal</h1>
             </div>
-            <div class="flex space-x-4">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
-                    <i class="fas fa-cog mr-2"></i> Settings
+            <button id="adminBtn" class="bg-indigo-600 hover:bg-indigo-800 px-4 py-2 rounded-lg transition">
+                <i class="fas fa-lock mr-2"></i>Admin Login
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Browse Embedded Websites</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Click on any site below to view it in an embedded window. These are read-only views.</p>
+        </div>
+
+        <!-- Sites Grid -->
+        <div id="sitesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Sites will be loaded here dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <i class="fas fa-window-maximize text-5xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-500">No websites added yet</h3>
+            <p class="text-gray-400">Admin can add websites to display here</p>
+        </div>
+    </main>
+
+    <!-- Site Viewer Modal -->
+    <div id="siteModal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative bg-white rounded-lg shadow-xl w-full max-w-6xl mx-4 h-[80vh] flex flex-col z-10">
+            <div class="flex justify-between items-center bg-gray-100 px-4 py-3 rounded-t-lg border-b">
+                <h3 id="modalTitle" class="font-semibold text-gray-800"></h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
-                <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center">
-                    <i class="fas fa-question-circle mr-2"></i> Help
+            </div>
+            <div class="iframe-container flex-grow">
+                <iframe id="siteFrame" class="responsive-iframe" allow="fullscreen"></iframe>
+            </div>
+            <div class="bg-gray-100 px-4 py-2 rounded-b-lg border-t text-sm text-gray-500 flex justify-between items-center">
+                <span>Embedded View - Read Only</span>
+                <button id="openNewTab" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                    <i class="fas fa-external-link-alt mr-1"></i> Open in New Tab
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Main Game Area -->
-        <div class="flex flex-col lg:flex-row gap-6">
-            <!-- Left Panel - Player Info -->
-            <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-lg p-4">
-                <h2 class="text-xl font-bold text-blue-800 mb-4 border-b pb-2">Players</h2>
-                
-                <!-- Current Player -->
-                <div class="bg-blue-50 p-3 rounded-lg mb-4 border-l-4 border-blue-500">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">1</div>
-                            <span class="font-bold">Player 1</span>
-                        </div>
-                        <span class="text-green-600 font-bold">$1,500,000</span>
-                    </div>
-                    <div class="mt-2 flex justify-between text-sm">
-                        <span class="text-gray-600">Turn: <span class="font-bold">Roll Dice</span></span>
-                        <span class="text-gray-600">Position: <span class="font-bold">GO</span></span>
-                    </div>
+    <!-- Admin Login Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6 z-10">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Admin Login</h3>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" required 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                
-                <!-- Other Players -->
-                <div class="space-y-3">
-                    <div class="bg-gray-50 p-3 rounded-lg border">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white font-bold mr-2">2</div>
-                                <span>Player 2</span>
-                            </div>
-                            <span class="text-green-600 font-bold">$1,500,000</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-lg border">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold mr-2">3</div>
-                                <span>Player 3</span>
-                            </div>
-                            <span class="text-green-600 font-bold">$1,500,000</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-lg border">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold mr-2">4</div>
-                                <span>Player 4</span>
-                            </div>
-                            <span class="text-green-600 font-bold">$1,500,000</span>
-                        </div>
-                    </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="password" required 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                
-                <!-- Player Actions -->
-                <div class="mt-6">
-                    <h3 class="font-bold text-blue-800 mb-2">Actions</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
-                            <i class="fas fa-home mr-1"></i> Buy
-                        </button>
-                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
-                            <i class="fas fa-gavel mr-1"></i> Auction
-                        </button>
-                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
-                            <i class="fas fa-building mr-1"></i> Build
-                        </button>
-                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
-                            <i class="fas fa-handshake mr-1"></i> Trade
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Dice Roll -->
-                <div class="mt-6 bg-gray-100 p-4 rounded-lg">
-                    <h3 class="font-bold text-blue-800 mb-2">Roll Dice</h3>
-                    <div class="flex justify-center space-x-4 mb-4">
-                        <div class="dice w-12 h-12 bg-white rounded shadow flex items-center justify-center text-2xl font-bold" id="dice1">?</div>
-                        <div class="dice w-12 h-12 bg-white rounded shadow flex items-center justify-center text-2xl font-bold" id="dice2">?</div>
-                    </div>
-                    <button id="rollDiceBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-bold">
-                        ROLL DICE
-                    </button>
-                </div>
+                <div id="loginError" class="text-red-500 text-sm hidden">Invalid credentials</div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel (hidden by default) -->
+    <div id="adminPanel" class="fixed inset-0 bg-gray-100 z-50 overflow-y-auto hidden">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-user-shield mr-2"></i> Admin Panel
+                </h2>
+                <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
             </div>
-            
-            <!-- Center Panel - Game Board -->
-            <div class="w-full lg:w-2/4">
-                <div class="relative w-full aspect-square bg-blue-900 rounded-xl shadow-xl overflow-hidden">
-                    <!-- Monopoly Board -->
-                    <div class="absolute inset-0 flex flex-col justify-between p-2">
-                        <!-- Top Row -->
-                        <div class="flex h-1/6">
-                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1">
-                                <div class="text-center font-bold text-xs">GO</div>
-                                <div class="text-green-600 font-bold text-sm mt-1">$2M</div>
-                            </div>
-                            
-                            <!-- Top Properties -->
-                            <div class="flex flex-grow">
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-blue-800"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Mediterranean Avenue
-                                        <div class="text-green-600">$60</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-blue-800"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Community Chest
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-blue-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Baltic Avenue
-                                        <div class="text-green-600">$60</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-red-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Income Tax
-                                        <div class="text-red-600">Pay $200</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-gray-800"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Reading Railroad
-                                        <div class="text-green-600">$200</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-orange-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Oriental Avenue
-                                        <div class="text-green-600">$100</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-orange-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Chance
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-orange-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Vermont Avenue
-                                        <div class="text-green-600">$100</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card">
-                                    <div class="h-1/3 bg-orange-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Connecticut Avenue
-                                        <div class="text-green-600">$120</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1 rotate-90">
-                                <div class="text-center font-bold text-xs">Jail</div>
-                                <div class="text-sm">Just Visiting</div>
-                            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Add New Site</h3>
+                <form id="addSiteForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="siteName" class="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
+                            <input type="text" id="siteName" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
-                        
-                        <!-- Middle Rows -->
-                        <div class="flex flex-grow">
-                            <!-- Left Properties -->
-                            <div class="w-1/6 h-full flex flex-col">
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-red-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        St. Charles Place
-                                        <div class="text-green-600">$140</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-red-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Electric Company
-                                        <div class="text-green-600">$150</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-red-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        States Avenue
-                                        <div class="text-green-600">$140</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-red-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Virginia Avenue
-                                        <div class="text-green-600">$160</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-gray-800"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Pennsylvania Railroad
-                                        <div class="text-green-600">$200</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-yellow-400"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        St. James Place
-                                        <div class="text-green-600">$180</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-yellow-400"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Community Chest
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-yellow-400"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Tennessee Avenue
-                                        <div class="text-green-600">$180</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-270">
-                                    <div class="h-1/3 bg-yellow-400"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        New York Avenue
-                                        <div class="text-green-600">$200</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Center Area -->
-                            <div class="w-4/6 h-full bg-blue-800 flex items-center justify-center relative">
-                                <div class="text-white text-center p-4">
-                                    <div class="text-4xl font-bold mb-2">MONOPOLY</div>
-                                    <div class="text-lg mb-4">Here & Now Edition</div>
-                                    <div class="grid grid-cols-3 gap-2">
-                                        <div class="bg-white text-blue-800 p-2 rounded">
-                                            <div class="font-bold">Bank</div>
-                                            <div class="text-green-600">$∞</div>
-                                        </div>
-                                        <div class="bg-white text-blue-800 p-2 rounded">
-                                            <div class="font-bold">Houses</div>
-                                            <div class="text-green-600">32</div>
-                                        </div>
-                                        <div class="bg-white text-blue-800 p-2 rounded">
-                                            <div class="font-bold">Hotels</div>
-                                            <div class="text-green-600">12</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Player Tokens -->
-                                <div class="absolute top-4 left-4 player-token w-6 h-6 rounded-full bg-blue-500"></div>
-                                <div class="absolute top-4 right-4 player-token w-6 h-6 rounded-full bg-red-500"></div>
-                                <div class="absolute bottom-4 left-4 player-token w-6 h-6 rounded-full bg-green-500"></div>
-                                <div class="absolute bottom-4 right-4 player-token w-6 h-6 rounded-full bg-yellow-500"></div>
-                            </div>
-                            
-                            <!-- Right Properties -->
-                            <div class="w-1/6 h-full flex flex-col">
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-green-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Kentucky Avenue
-                                        <div class="text-green-600">$220</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-green-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Chance
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-green-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Indiana Avenue
-                                        <div class="text-green-600">$220</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-green-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Illinois Avenue
-                                        <div class="text-green-600">$240</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-gray-800"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        B. & O. Railroad
-                                        <div class="text-green-600">$200</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-blue-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Atlantic Avenue
-                                        <div class="text-green-600">$260</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-blue-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Ventnor Avenue
-                                        <div class="text-green-600">$260</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-blue-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Water Works
-                                        <div class="text-green-600">$150</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-90">
-                                    <div class="h-1/3 bg-blue-500"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Marvin Gardens
-                                        <div class="text-green-600">$280</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Bottom Row -->
-                        <div class="flex h-1/6">
-                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1 rotate-270">
-                                <div class="text-center font-bold text-xs">Free Parking</div>
-                            </div>
-                            
-                            <!-- Bottom Properties -->
-                            <div class="flex flex-grow">
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-purple-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Pacific Avenue
-                                        <div class="text-green-600">$300</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-purple-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        North Carolina Avenue
-                                        <div class="text-green-600">$300</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-purple-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Community Chest
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-purple-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Pennsylvania Avenue
-                                        <div class="text-green-600">$320</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-gray-800"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Short Line
-                                        <div class="text-green-600">$200</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-orange-300"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Chance
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-orange-300"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Park Place
-                                        <div class="text-green-600">$350</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-red-600"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Luxury Tax
-                                        <div class="text-red-600">Pay $100</div>
-                                    </div>
-                                </div>
-                                <div class="side-cell bg-blue-50 property-card rotate-180">
-                                    <div class="h-1/3 bg-orange-300"></div>
-                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
-                                        Boardwalk
-                                        <div class="text-green-600">$400</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1 rotate-180">
-                                <div class="text-center font-bold text-xs">Go To Jail</div>
-                            </div>
+                        <div>
+                            <label for="siteUrl" class="block text-sm font-medium text-gray-700 mb-1">Site URL</label>
+                            <input type="url" id="siteUrl" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
                     </div>
-                </div>
+                    <div>
+                        <label for="siteIcon" class="block text-sm font-medium text-gray-700 mb-1">Icon (Font Awesome class)</label>
+                        <input type="text" id="siteIcon" placeholder="fas fa-globe" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label for="siteColor" class="block text-sm font-medium text-gray-700 mb-1">Card Color</label>
+                        <select id="siteColor" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="bg-blue-100 border-blue-300">Blue</option>
+                            <option value="bg-green-100 border-green-300">Green</option>
+                            <option value="bg-red-100 border-red-300">Red</option>
+                            <option value="bg-yellow-100 border-yellow-300">Yellow</option>
+                            <option value="bg-purple-100 border-purple-300">Purple</option>
+                            <option value="bg-pink-100 border-pink-300">Pink</option>
+                            <option value="bg-indigo-100 border-indigo-300">Indigo</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition">
+                        <i class="fas fa-plus mr-2"></i> Add Site
+                    </button>
+                </form>
             </div>
-            
-            <!-- Right Panel - Property Info and Actions -->
-            <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-lg p-4">
-                <h2 class="text-xl font-bold text-blue-800 mb-4 border-b pb-2">Property Info</h2>
-                
-                <!-- Selected Property -->
-                <div class="bg-blue-50 rounded-lg p-4 mb-4 border border-blue-200">
-                    <div class="h-8 bg-blue-600 mb-2 rounded"></div>
-                    <h3 class="font-bold text-lg">Boardwalk</h3>
-                    <div class="text-sm text-gray-600 mb-2">Dark Blue Property</div>
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div class="bg-white p-1 rounded text-center">
-                            <div class="text-xs">Price</div>
-                            <div class="font-bold text-green-600">$400</div>
-                        </div>
-                        <div class="bg-white p-1 rounded text-center">
-                            <div class="text-xs">Rent</div>
-                            <div class="font-bold">$50</div>
-                        </div>
-                        <div class="bg-white p-1 rounded text-center">
-                            <div class="text-xs">With 1 House</div>
-                            <div class="font-bold">$200</div>
-                        </div>
-                        <div class="bg-white p-1 rounded text-center">
-                            <div class="text-xs">With Hotel</div>
-                            <div class="font-bold">$1000</div>
-                        </div>
-                    </div>
-                    <div class="text-xs">
-                        <div class="flex justify-between mb-1">
-                            <span>Mortgage Value:</span>
-                            <span class="font-bold">$200</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Houses Cost:</span>
-                            <span class="font-bold">$200 each</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Property Owner -->
-                <div class="bg-yellow-50 rounded-lg p-3 mb-4 border border-yellow-200">
-                    <h3 class="font-bold text-sm mb-1">Owned by:</h3>
-                    <div class="flex items-center">
-                        <div class="w-6 h-6 rounded-full bg-red-500 mr-2"></div>
-                        <span>Player 2</span>
-                    </div>
-                    <div class="mt-2 text-sm">
-                        <div class="flex justify-between">
-                            <span>Houses:</span>
-                            <span class="font-bold">2</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Hotels:</span>
-                            <span class="font-bold">0</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Rent Due -->
-                <div class="bg-red-50 rounded-lg p-3 mb-4 border border-red-200">
-                    <h3 class="font-bold text-red-700">Rent Due: $200</h3>
-                    <div class="text-sm text-gray-600">For landing on Boardwalk with 2 houses</div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="space-y-2">
-                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-bold">
-                        PAY RENT
-                    </button>
-                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">
-                        OFFER TRADE
-                    </button>
-                    <button class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-bold">
-                        MORTGAGE INFO
-                    </button>
-                </div>
-                
-                <!-- Game History -->
-                <div class="mt-6">
-                    <h3 class="font-bold text-blue-800 mb-2">Game History</h3>
-                    <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
-                        <div class="text-sm mb-2">
-                            <span class="font-bold">Player 1</span> rolled 7 and moved to St. James Place
-                        </div>
-                        <div class="text-sm mb-2">
-                            <span class="font-bold">Player 2</span> paid $50 rent to Player 3
-                        </div>
-                        <div class="text-sm mb-2">
-                            <span class="font-bold">Player 3</span> bought Park Place for $350
-                        </div>
-                        <div class="text-sm mb-2">
-                            <span class="font-bold">Player 4</span> drew a Chance card
-                        </div>
-                        <div class="text-sm">
-                            <span class="font-bold">Player 1</span> passed GO and collected $2M
-                        </div>
-                    </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Manage Sites</h3>
+                <div id="adminSitesContainer" class="space-y-4">
+                    <!-- Sites will be loaded here for management -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Dice Roll Functionality
-        document.getElementById('rollDiceBtn').addEventListener('click', function() {
-            const dice1 = document.getElementById('dice1');
-            const dice2 = document.getElementById('dice2');
-            
-            // Add rolling animation
-            dice1.classList.add('dice');
-            dice2.classList.add('dice');
-            
-            // Clear previous values
-            dice1.textContent = '?';
-            dice2.textContent = '?';
-            
-            // Disable button during roll
-            this.disabled = true;
-            
-            // Simulate rolling animation
-            setTimeout(() => {
-                const value1 = Math.floor(Math.random() * 6) + 1;
-                const value2 = Math.floor(Math.random() * 6) + 1;
-                
-                dice1.textContent = value1;
-                dice2.textContent = value2;
-                
-                // Re-enable button
-                this.disabled = false;
-                
-                // Remove animation class
-                setTimeout(() => {
-                    dice1.classList.remove('dice');
-                    dice2.classList.remove('dice');
-                }, 500);
-                
-                // Show move result
-                alert(`You rolled ${value1 + value2}! Move ${value1 + value2} spaces.`);
-                
-            }, 1000);
+        // Admin credentials (in a real app, this would be server-side)
+        const ADMIN_CREDENTIALS = {
+            username: "Aland-luqman",
+            password: "aland1234567890" // In production, use proper authentication
+        };
+
+        // DOM Elements
+        const sitesContainer = document.getElementById('sitesContainer');
+        const emptyState = document.getElementById('emptyState');
+        const siteModal = document.getElementById('siteModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const siteFrame = document.getElementById('siteFrame');
+        const closeModal = document.getElementById('closeModal');
+        const openNewTab = document.getElementById('openNewTab');
+        const adminBtn = document.getElementById('adminBtn');
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const adminPanel = document.getElementById('adminPanel');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addSiteForm = document.getElementById('addSiteForm');
+        const adminSitesContainer = document.getElementById('adminSitesContainer');
+
+        // Current state
+        let currentSiteUrl = '';
+        let isAdmin = false;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSites();
+            setupEventListeners();
         });
-        
-        // Property card hover effects
-        const propertyCards = document.querySelectorAll('.property-card');
-        propertyCards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-5px) rotateX(5deg)';
-                card.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+
+        function setupEventListeners() {
+            // Close modal when clicking overlay or close button
+            siteModal.addEventListener('click', (e) => {
+                if (e.target === siteModal || e.target.classList.contains('modal-overlay')) {
+                    closeSiteModal();
+                }
             });
             
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
-                card.style.boxShadow = '';
+            closeModal.addEventListener('click', closeSiteModal);
+            
+            // Open current site in new tab
+            openNewTab.addEventListener('click', () => {
+                window.open(currentSiteUrl, '_blank');
             });
-        });
+            
+            // Admin button opens login modal
+            adminBtn.addEventListener('click', () => {
+                if (isAdmin) {
+                    openAdminPanel();
+                } else {
+                    loginModal.classList.remove('hidden');
+                }
+            });
+            
+            // Login form submission
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    isAdmin = true;
+                    loginModal.classList.add('hidden');
+                    openAdminPanel();
+                } else {
+                    loginError.classList.remove('hidden');
+                }
+            });
+            
+            // Logout button
+            logoutBtn.addEventListener('click', () => {
+                isAdmin = false;
+                adminPanel.classList.add('hidden');
+            });
+            
+            // Add site form
+            addSiteForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('siteName').value;
+                const url = document.getElementById('siteUrl').value;
+                const icon = document.getElementById('siteIcon').value || 'fas fa-globe';
+                const color = document.getElementById('siteColor').value;
+                
+                addSite({ name, url, icon, color });
+                addSiteForm.reset();
+            });
+        }
+
+        function loadSites() {
+            let sites = JSON.parse(localStorage.getItem('sites')) || [];
+            
+            if (sites.length === 0) {
+                // Add some default sites if none exist
+                sites = [
+                    {
+                        name: "Wikipedia",
+                        url: "https://en.wikipedia.org/wiki/Main_Page",
+                        icon: "fas fa-book",
+                        color: "bg-blue-100 border-blue-300"
+                    },
+                    {
+                        name: "GitHub",
+                        url: "https://github.com",
+                        icon: "fab fa-github",
+                        color: "bg-gray-100 border-gray-300"
+                    },
+                    {
+                        name: "Google",
+                        url: "https://www.google.com",
+                        icon: "fab fa-google",
+                        color: "bg-green-100 border-green-300"
+                    }
+                ];
+                localStorage.setItem('sites', JSON.stringify(sites));
+            }
+            
+            renderSites(sites);
+            if (isAdmin) {
+                renderAdminSites(sites);
+            }
+        }
+
+        function renderSites(sites) {
+            if (sites.length === 0) {
+                emptyState.classList.remove('hidden');
+                sitesContainer.classList.add('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            sitesContainer.classList.remove('hidden');
+            sitesContainer.innerHTML = '';
+            
+            sites.forEach(site => {
+                const siteCard = document.createElement('div');
+                siteCard.className = `site-card ${site.color} border-2 rounded-xl p-6 shadow-sm cursor-pointer flex flex-col items-center justify-center`;
+                siteCard.innerHTML = `
+                    <i class="${site.icon} text-4xl mb-3 text-gray-700"></i>
+                    <h3 class="text-lg font-semibold text-gray-800">${site.name}</h3>
+                    <p class="text-sm text-gray-500 mt-1 truncate w-full text-center">${site.url}</p>
+                `;
+                siteCard.addEventListener('click', () => openSite(site.url, site.name));
+                sitesContainer.appendChild(siteCard);
+            });
+        }
+
+        function openSite(url, name) {
+            currentSiteUrl = url;
+            modalTitle.textContent = name;
+            siteFrame.src = url;
+            siteModal.classList.remove('hidden');
+        }
+
+        function closeSiteModal() {
+            siteModal.classList.add('hidden');
+            siteFrame.src = '';
+        }
+
+        function openAdminPanel() {
+            adminPanel.classList.remove('hidden');
+            const sites = JSON.parse(localStorage.getItem('sites')) || [];
+            renderAdminSites(sites);
+        }
+
+        function renderAdminSites(sites) {
+            adminSitesContainer.innerHTML = '';
+            
+            if (sites.length === 0) {
+                adminSitesContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No sites added yet</p>';
+                return;
+            }
+            
+            sites.forEach((site, index) => {
+                const siteItem = document.createElement('div');
+                siteItem.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200 flex justify-between items-center';
+                siteItem.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <i class="${site.icon} text-xl text-gray-700"></i>
+                        <div>
+                            <h4 class="font-medium text-gray-800">${site.name}</h4>
+                            <p class="text-sm text-gray-500 truncate max-w-xs">${site.url}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="edit-btn px-3 py-1 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200 transition" data-index="${index}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                adminSitesContainer.appendChild(siteItem);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.currentTarget.getAttribute('data-index');
+                    editSite(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.currentTarget.getAttribute('data-index');
+                    deleteSite(index);
+                });
+            });
+        }
+
+        function addSite(site) {
+            let sites = JSON.parse(localStorage.getItem('sites')) || [];
+            sites.push(site);
+            localStorage.setItem('sites', JSON.stringify(sites));
+            renderSites(sites);
+            renderAdminSites(sites);
+        }
+
+        function editSite(index) {
+            let sites = JSON.parse(localStorage.getItem('sites')) || [];
+            const site = sites[index];
+            
+            // Fill the form with the site data
+            document.getElementById('siteName').value = site.name;
+            document.getElementById('siteUrl').value = site.url;
+            document.getElementById('siteIcon').value = site.icon;
+            document.getElementById('siteColor').value = site.color;
+            
+            // Remove the site from the list
+            sites.splice(index, 1);
+            localStorage.setItem('sites', JSON.stringify(sites));
+            
+            // Update the UI
+            renderSites(sites);
+            renderAdminSites(sites);
+        }
+
+        function deleteSite(index) {
+            if (confirm('Are you sure you want to delete this site?')) {
+                let sites = JSON.parse(localStorage.getItem('sites')) || [];
+                sites.splice(index, 1);
+                localStorage.setItem('sites', JSON.stringify(sites));
+                renderSites(sites);
+                renderAdminSites(sites);
+            }
+        }
     </script>
 </body>
 </html>
