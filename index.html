@@ -1,30 +1,641 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Flash Card - Learn English</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Here & Now Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .property-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .property-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .board-cell {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .corner-cell {
+            width: 12%;
+            height: 12%;
+        }
+        .side-cell {
+            width: 7.6%;
+            height: 12%;
+        }
+        .rotate-90 {
+            transform: rotate(90deg);
+        }
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+        .rotate-270 {
+            transform: rotate(270deg);
+        }
+        .dice {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            50% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .player-token {
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 font-sans">
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center mb-8">Welcome to Flash Card</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {% for level, data in vocabulary.items() %}
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-bold">{{ data.name }}</h2>
-                <p class="text-gray-600 mb-4">{{ data.description }}</p>
-                <p class="mb-2">Words: {{ data.words|length }}</p>
-                <a href="/start_level/{{ level }}" 
-                   class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    Start Learning
-                </a>
+        <!-- Game Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-crown text-yellow-500 text-3xl mr-2"></i>
+                <h1 class="text-3xl font-bold text-blue-800">MONOPOLY</h1>
+                <span class="ml-2 text-sm bg-blue-600 text-white px-2 py-1 rounded">Here & Now Edition</span>
             </div>
-            {% endfor %}
+            <div class="flex space-x-4">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                    <i class="fas fa-cog mr-2"></i> Settings
+                </button>
+                <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center">
+                    <i class="fas fa-question-circle mr-2"></i> Help
+                </button>
+            </div>
         </div>
-        
-        <div class="mt-8 text-center">
-            <p>Total visitors: {{ visitor_count }}</p>
+
+        <!-- Main Game Area -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Left Panel - Player Info -->
+            <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-lg p-4">
+                <h2 class="text-xl font-bold text-blue-800 mb-4 border-b pb-2">Players</h2>
+                
+                <!-- Current Player -->
+                <div class="bg-blue-50 p-3 rounded-lg mb-4 border-l-4 border-blue-500">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-2">1</div>
+                            <span class="font-bold">Player 1</span>
+                        </div>
+                        <span class="text-green-600 font-bold">$1,500,000</span>
+                    </div>
+                    <div class="mt-2 flex justify-between text-sm">
+                        <span class="text-gray-600">Turn: <span class="font-bold">Roll Dice</span></span>
+                        <span class="text-gray-600">Position: <span class="font-bold">GO</span></span>
+                    </div>
+                </div>
+                
+                <!-- Other Players -->
+                <div class="space-y-3">
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white font-bold mr-2">2</div>
+                                <span>Player 2</span>
+                            </div>
+                            <span class="text-green-600 font-bold">$1,500,000</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold mr-2">3</div>
+                                <span>Player 3</span>
+                            </div>
+                            <span class="text-green-600 font-bold">$1,500,000</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold mr-2">4</div>
+                                <span>Player 4</span>
+                            </div>
+                            <span class="text-green-600 font-bold">$1,500,000</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Player Actions -->
+                <div class="mt-6">
+                    <h3 class="font-bold text-blue-800 mb-2">Actions</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
+                            <i class="fas fa-home mr-1"></i> Buy
+                        </button>
+                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
+                            <i class="fas fa-gavel mr-1"></i> Auction
+                        </button>
+                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
+                            <i class="fas fa-building mr-1"></i> Build
+                        </button>
+                        <button class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-2 rounded flex items-center justify-center">
+                            <i class="fas fa-handshake mr-1"></i> Trade
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dice Roll -->
+                <div class="mt-6 bg-gray-100 p-4 rounded-lg">
+                    <h3 class="font-bold text-blue-800 mb-2">Roll Dice</h3>
+                    <div class="flex justify-center space-x-4 mb-4">
+                        <div class="dice w-12 h-12 bg-white rounded shadow flex items-center justify-center text-2xl font-bold" id="dice1">?</div>
+                        <div class="dice w-12 h-12 bg-white rounded shadow flex items-center justify-center text-2xl font-bold" id="dice2">?</div>
+                    </div>
+                    <button id="rollDiceBtn" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-bold">
+                        ROLL DICE
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Center Panel - Game Board -->
+            <div class="w-full lg:w-2/4">
+                <div class="relative w-full aspect-square bg-blue-900 rounded-xl shadow-xl overflow-hidden">
+                    <!-- Monopoly Board -->
+                    <div class="absolute inset-0 flex flex-col justify-between p-2">
+                        <!-- Top Row -->
+                        <div class="flex h-1/6">
+                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1">
+                                <div class="text-center font-bold text-xs">GO</div>
+                                <div class="text-green-600 font-bold text-sm mt-1">$2M</div>
+                            </div>
+                            
+                            <!-- Top Properties -->
+                            <div class="flex flex-grow">
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-blue-800"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Mediterranean Avenue
+                                        <div class="text-green-600">$60</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-blue-800"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Community Chest
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-blue-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Baltic Avenue
+                                        <div class="text-green-600">$60</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-red-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Income Tax
+                                        <div class="text-red-600">Pay $200</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-gray-800"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Reading Railroad
+                                        <div class="text-green-600">$200</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-orange-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Oriental Avenue
+                                        <div class="text-green-600">$100</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-orange-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Chance
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-orange-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Vermont Avenue
+                                        <div class="text-green-600">$100</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card">
+                                    <div class="h-1/3 bg-orange-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Connecticut Avenue
+                                        <div class="text-green-600">$120</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1 rotate-90">
+                                <div class="text-center font-bold text-xs">Jail</div>
+                                <div class="text-sm">Just Visiting</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Middle Rows -->
+                        <div class="flex flex-grow">
+                            <!-- Left Properties -->
+                            <div class="w-1/6 h-full flex flex-col">
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-red-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        St. Charles Place
+                                        <div class="text-green-600">$140</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-red-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Electric Company
+                                        <div class="text-green-600">$150</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-red-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        States Avenue
+                                        <div class="text-green-600">$140</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-red-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Virginia Avenue
+                                        <div class="text-green-600">$160</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-gray-800"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Pennsylvania Railroad
+                                        <div class="text-green-600">$200</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-yellow-400"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        St. James Place
+                                        <div class="text-green-600">$180</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-yellow-400"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Community Chest
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-yellow-400"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Tennessee Avenue
+                                        <div class="text-green-600">$180</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-270">
+                                    <div class="h-1/3 bg-yellow-400"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        New York Avenue
+                                        <div class="text-green-600">$200</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Center Area -->
+                            <div class="w-4/6 h-full bg-blue-800 flex items-center justify-center relative">
+                                <div class="text-white text-center p-4">
+                                    <div class="text-4xl font-bold mb-2">MONOPOLY</div>
+                                    <div class="text-lg mb-4">Here & Now Edition</div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div class="bg-white text-blue-800 p-2 rounded">
+                                            <div class="font-bold">Bank</div>
+                                            <div class="text-green-600">$∞</div>
+                                        </div>
+                                        <div class="bg-white text-blue-800 p-2 rounded">
+                                            <div class="font-bold">Houses</div>
+                                            <div class="text-green-600">32</div>
+                                        </div>
+                                        <div class="bg-white text-blue-800 p-2 rounded">
+                                            <div class="font-bold">Hotels</div>
+                                            <div class="text-green-600">12</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Player Tokens -->
+                                <div class="absolute top-4 left-4 player-token w-6 h-6 rounded-full bg-blue-500"></div>
+                                <div class="absolute top-4 right-4 player-token w-6 h-6 rounded-full bg-red-500"></div>
+                                <div class="absolute bottom-4 left-4 player-token w-6 h-6 rounded-full bg-green-500"></div>
+                                <div class="absolute bottom-4 right-4 player-token w-6 h-6 rounded-full bg-yellow-500"></div>
+                            </div>
+                            
+                            <!-- Right Properties -->
+                            <div class="w-1/6 h-full flex flex-col">
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-green-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Kentucky Avenue
+                                        <div class="text-green-600">$220</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-green-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Chance
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-green-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Indiana Avenue
+                                        <div class="text-green-600">$220</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-green-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Illinois Avenue
+                                        <div class="text-green-600">$240</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-gray-800"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        B. & O. Railroad
+                                        <div class="text-green-600">$200</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-blue-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Atlantic Avenue
+                                        <div class="text-green-600">$260</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-blue-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Ventnor Avenue
+                                        <div class="text-green-600">$260</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-blue-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Water Works
+                                        <div class="text-green-600">$150</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-90">
+                                    <div class="h-1/3 bg-blue-500"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Marvin Gardens
+                                        <div class="text-green-600">$280</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bottom Row -->
+                        <div class="flex h-1/6">
+                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1 rotate-270">
+                                <div class="text-center font-bold text-xs">Free Parking</div>
+                            </div>
+                            
+                            <!-- Bottom Properties -->
+                            <div class="flex flex-grow">
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-purple-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Pacific Avenue
+                                        <div class="text-green-600">$300</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-purple-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        North Carolina Avenue
+                                        <div class="text-green-600">$300</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-purple-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Community Chest
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-purple-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Pennsylvania Avenue
+                                        <div class="text-green-600">$320</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-gray-800"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Short Line
+                                        <div class="text-green-600">$200</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-orange-300"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Chance
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-orange-300"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Park Place
+                                        <div class="text-green-600">$350</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-red-600"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Luxury Tax
+                                        <div class="text-red-600">Pay $100</div>
+                                    </div>
+                                </div>
+                                <div class="side-cell bg-blue-50 property-card rotate-180">
+                                    <div class="h-1/3 bg-orange-300"></div>
+                                    <div class="h-2/3 p-1 text-center text-xs font-bold">
+                                        Boardwalk
+                                        <div class="text-green-600">$400</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="corner-cell bg-red-100 flex flex-col items-center justify-center p-1 rotate-180">
+                                <div class="text-center font-bold text-xs">Go To Jail</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Property Info and Actions -->
+            <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-lg p-4">
+                <h2 class="text-xl font-bold text-blue-800 mb-4 border-b pb-2">Property Info</h2>
+                
+                <!-- Selected Property -->
+                <div class="bg-blue-50 rounded-lg p-4 mb-4 border border-blue-200">
+                    <div class="h-8 bg-blue-600 mb-2 rounded"></div>
+                    <h3 class="font-bold text-lg">Boardwalk</h3>
+                    <div class="text-sm text-gray-600 mb-2">Dark Blue Property</div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="bg-white p-1 rounded text-center">
+                            <div class="text-xs">Price</div>
+                            <div class="font-bold text-green-600">$400</div>
+                        </div>
+                        <div class="bg-white p-1 rounded text-center">
+                            <div class="text-xs">Rent</div>
+                            <div class="font-bold">$50</div>
+                        </div>
+                        <div class="bg-white p-1 rounded text-center">
+                            <div class="text-xs">With 1 House</div>
+                            <div class="font-bold">$200</div>
+                        </div>
+                        <div class="bg-white p-1 rounded text-center">
+                            <div class="text-xs">With Hotel</div>
+                            <div class="font-bold">$1000</div>
+                        </div>
+                    </div>
+                    <div class="text-xs">
+                        <div class="flex justify-between mb-1">
+                            <span>Mortgage Value:</span>
+                            <span class="font-bold">$200</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Houses Cost:</span>
+                            <span class="font-bold">$200 each</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Property Owner -->
+                <div class="bg-yellow-50 rounded-lg p-3 mb-4 border border-yellow-200">
+                    <h3 class="font-bold text-sm mb-1">Owned by:</h3>
+                    <div class="flex items-center">
+                        <div class="w-6 h-6 rounded-full bg-red-500 mr-2"></div>
+                        <span>Player 2</span>
+                    </div>
+                    <div class="mt-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Houses:</span>
+                            <span class="font-bold">2</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Hotels:</span>
+                            <span class="font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rent Due -->
+                <div class="bg-red-50 rounded-lg p-3 mb-4 border border-red-200">
+                    <h3 class="font-bold text-red-700">Rent Due: $200</h3>
+                    <div class="text-sm text-gray-600">For landing on Boardwalk with 2 houses</div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-2">
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-bold">
+                        PAY RENT
+                    </button>
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold">
+                        OFFER TRADE
+                    </button>
+                    <button class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-bold">
+                        MORTGAGE INFO
+                    </button>
+                </div>
+                
+                <!-- Game History -->
+                <div class="mt-6">
+                    <h3 class="font-bold text-blue-800 mb-2">Game History</h3>
+                    <div class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                        <div class="text-sm mb-2">
+                            <span class="font-bold">Player 1</span> rolled 7 and moved to St. James Place
+                        </div>
+                        <div class="text-sm mb-2">
+                            <span class="font-bold">Player 2</span> paid $50 rent to Player 3
+                        </div>
+                        <div class="text-sm mb-2">
+                            <span class="font-bold">Player 3</span> bought Park Place for $350
+                        </div>
+                        <div class="text-sm mb-2">
+                            <span class="font-bold">Player 4</span> drew a Chance card
+                        </div>
+                        <div class="text-sm">
+                            <span class="font-bold">Player 1</span> passed GO and collected $2M
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Dice Roll Functionality
+        document.getElementById('rollDiceBtn').addEventListener('click', function() {
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            
+            // Add rolling animation
+            dice1.classList.add('dice');
+            dice2.classList.add('dice');
+            
+            // Clear previous values
+            dice1.textContent = '?';
+            dice2.textContent = '?';
+            
+            // Disable button during roll
+            this.disabled = true;
+            
+            // Simulate rolling animation
+            setTimeout(() => {
+                const value1 = Math.floor(Math.random() * 6) + 1;
+                const value2 = Math.floor(Math.random() * 6) + 1;
+                
+                dice1.textContent = value1;
+                dice2.textContent = value2;
+                
+                // Re-enable button
+                this.disabled = false;
+                
+                // Remove animation class
+                setTimeout(() => {
+                    dice1.classList.remove('dice');
+                    dice2.classList.remove('dice');
+                }, 500);
+                
+                // Show move result
+                alert(`You rolled ${value1 + value2}! Move ${value1 + value2} spaces.`);
+                
+            }, 1000);
+        });
+        
+        // Property card hover effects
+        const propertyCards = document.querySelectorAll('.property-card');
+        propertyCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px) rotateX(5deg)';
+                card.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            });
+        });
+    </script>
 </body>
 </html>
